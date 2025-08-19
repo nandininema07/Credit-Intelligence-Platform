@@ -1,5 +1,10 @@
 import json
+import os
 from typing import Dict
+from dotenv import load_dotenv
+
+# Load environment variables from .env file in the root directory
+load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), '..', '..', '.env'))
 
 class ConfigManager:
     def __init__(self, config_path: str = "config.json"):
@@ -18,20 +23,25 @@ class ConfigManager:
             "aws": {
                 "region": "us-east-1",
                 "s3_bucket": "credtech-data-lake",
-                "access_key": "",
-                "secret_key": ""
+                "access_key": os.getenv("AWS_ACCESS_KEY", ""),
+                "secret_key": os.getenv("AWS_SECRET_KEY", "")
             },
             "database": {
-                "url": "postgresql://user:pass@localhost:5432/credtech"
+                "url": os.getenv("DATABASE_URL", "postgresql://user:pass@localhost:5432/credtech"),
+                "host": os.getenv("DB_HOST", "localhost"),
+                "port": os.getenv("DB_PORT", "5432"),
+                "name": os.getenv("DB_NAME", "credtech"),
+                "user": os.getenv("DB_USER", "user"),
+                "password": os.getenv("DB_PASSWORD", "pass")
             },
             "apis": {
-                "newsapi_key": "",
-                "twitter_bearer_token": "",
-                "reddit_client_id": "",
-                "reddit_client_secret": "",
-                "alpha_vantage_key": "",
-                "fred_key": "",
-                "world_bank_key": ""
+                "newsapi_key": os.getenv("NEWSAPI_KEY", ""),
+                "twitter_bearer_token": os.getenv("TWITTER_BEARER_TOKEN", ""),
+                "reddit_client_id": os.getenv("REDDIT_CLIENT_ID", ""),
+                "reddit_client_secret": os.getenv("REDDIT_CLIENT_SECRET", ""),
+                "alpha_vantage_key": os.getenv("ALPHA_VANTAGE_KEY", ""),
+                "fred_key": os.getenv("FRED_KEY", ""),
+                "world_bank_key": os.getenv("WORLD_BANK_KEY", "")
             },
             "sources": {
                 "news_sources": ["reuters", "bloomberg", "wsj", "ft", "cnbc", "marketwatch"],
