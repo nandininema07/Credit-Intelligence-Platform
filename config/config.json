@@ -1,0 +1,85 @@
+{
+  "aws": {
+    "region": "us-east-1",
+    "s3_bucket": "credtech-data-lake",
+    "access_key": "${AWS_ACCESS_KEY}",
+    "secret_key": "${AWS_SECRET_KEY}"
+  },
+  "database": {
+    "url": "postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}"
+  },
+  "redis": {
+    "host": "localhost",
+    "port": 6379,
+    "db": 0
+  },
+  "apis": {
+    "newsapi_key": "${NEWSAPI_KEY}",
+    "twitter_bearer_token": "${TWITTER_BEARER_TOKEN}",
+    "reddit_client_id": "${REDDIT_CLIENT_ID}",
+    "reddit_client_secret": "${REDDIT_CLIENT_SECRET}",
+    "alpha_vantage_key": "${ALPHA_VANTAGE_KEY}",
+    "fred_key": "${FRED_KEY}",
+    "world_bank_key": "${WORLD_BANK_KEY}",
+    "finnhub_key": "${FINNHUB_KEY}",
+    "polygon_key": "${POLYGON_KEY}"
+  },
+  "sources": {
+    "news_sources": {
+      "english": ["reuters", "bloomberg", "wsj", "ft", "cnbc", "marketwatch", "seeking-alpha"],
+      "international": {
+        "spanish": ["expansion", "cincodias", "eleconomista"],
+        "german": ["handelsblatt", "manager-magazin", "wiwo"],
+        "french": ["lesechos", "latribune", "boursorama"],
+        "japanese": ["nikkei", "kabutan", "bloomberg-jp"],
+        "chinese": ["sina-finance", "163-money", "eastmoney"],
+        "hindi": ["livemint", "economic-times", "moneycontrol"]
+      }
+    },
+    "rss_feeds": [
+      "https://feeds.reuters.com/reuters/businessNews",
+      "https://feeds.bloomberg.com/markets/news.rss",
+      "https://www.wsj.com/xml/rss/3_7085.xml",
+      "https://www.ft.com/rss/feed/companies",
+      "https://feeds.cnbc.com/cnbc/id/100003114/device/rss/rss.html"
+    ],
+    "international_rss": {
+      "german": ["https://www.handelsblatt.com/contentexport/feed/schlagzeilen"],
+      "french": ["https://www.lesechos.fr/rss/lesechos_actualites_accueil.xml"],
+      "spanish": ["https://www.expansion.com/rss/portada.xml"],
+      "japanese": ["https://www.nikkei.com/news/category/markets.rss"],
+      "chinese": ["http://finance.sina.com.cn/roll/index.d.html?cid=56588&page=1"]
+    },
+    "social_platforms": ["twitter", "reddit", "linkedin", "weibo"],
+    "financial_apis": ["yahoo", "alpha_vantage", "fred", "world_bank", "finnhub", "polygon"]
+  },
+  "companies": {
+    "exchanges": {
+      "US": ["NYSE", "NASDAQ"],
+      "UK": ["LSE"],
+      "EU": ["DAX", "CAC", "AEX"],
+      "ASIA": ["TSE", "HKEX", "BSE", "NSE", "SSE", "SZSE"],
+      "OTHERS": ["TSX", "ASX", "JSE"]
+    },
+    "sectors": [
+      "technology", "finance", "healthcare", "energy", 
+      "retail", "industrials", "utilities", "real-estate",
+      "materials", "consumer-goods", "telecommunications"
+    ],
+    "market_caps": ["large", "mid", "small", "micro"]
+  },
+  "processing": {
+    "batch_size": 100,
+    "max_workers": 20,
+    "update_frequency": 300,
+    "languages": ["en", "es", "fr", "de", "ja", "zh", "hi", "pt", "ru", "ar"],
+    "sentiment_threshold": 0.1,
+    "content_max_length": 5000
+  },
+  "monitoring": {
+    "health_check_interval": 60,
+    "error_threshold": 10,
+    "retry_attempts": 3,
+    "timeout_seconds": 30
+  }
+}

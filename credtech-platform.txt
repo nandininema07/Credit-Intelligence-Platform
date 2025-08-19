@@ -1,0 +1,381 @@
+credtech-platform/
+├── README.md                           # Main project documentation
+├── docker-compose.yml                  # Multi-service orchestration
+├── Dockerfile                          # Main application container
+├── requirements.txt                    # Python dependencies
+├── .env.example                        # Environment variables template
+├── .gitignore                          # Git ignore file
+├── config/                             # Configuration files
+│   ├── config.json                     # Main configuration
+│   ├── docker.env                      # Docker environment
+│   ├── sources.json                    # Data source configurations
+│   └── model_config.yaml               # ML model configurations
+├── docs/                               # Documentation
+│   ├── architecture.md                 # System architecture
+│   ├── api.md                         # API documentation
+│   ├── deployment.md                  # Deployment guide
+│   └── data_sources.md                # Data sources documentation
+├── tests/                              # Test suites
+│   ├── unit/                          # Unit tests
+│   ├── integration/                   # Integration tests
+│   ├── e2e/                           # End-to-end tests
+│   └── test_data/                     # Test data samples
+├── scripts/                            # Utility scripts
+│   ├── setup.sh                       # Environment setup
+│   ├── deploy.sh                      # Deployment script
+│   ├── backup.sh                      # Data backup script
+│   └── monitoring.sh                  # Health check script
+├── frontend/                           # React.js Frontend Application
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── Dockerfile
+│   ├── public/
+│   │   ├── index.html
+│   │   └── manifest.json
+│   ├── src/
+│   │   ├── components/                 # Reusable components
+│   │   │   ├── common/
+│   │   │   │   ├── Header.jsx
+│   │   │   │   ├── Sidebar.jsx
+│   │   │   │   ├── LoadingSpinner.jsx
+│   │   │   │   └── ErrorBoundary.jsx
+│   │   │   ├── dashboard/
+│   │   │   │   ├── DashboardOverview.jsx
+│   │   │   │   ├── TopMovers.jsx
+│   │   │   │   ├── AlertsFeed.jsx
+│   │   │   │   └── CreditScoreCard.jsx
+│   │   │   ├── company/
+│   │   │   │   ├── CompanyProfile.jsx
+│   │   │   │   ├── CreditScoreDisplay.jsx
+│   │   │   │   ├── HistoricalChart.jsx
+│   │   │   │   ├── RiskFactors.jsx
+│   │   │   │   ├── ExplainabilityChart.jsx
+│   │   │   │   └── GlobalDataMap.jsx
+│   │   │   ├── chatbot/
+│   │   │   │   ├── ChatInterface.jsx
+│   │   │   │   ├── MessageBubble.jsx
+│   │   │   │   └── ScoreSimulator.jsx
+│   │   │   ├── alerts/
+│   │   │   │   ├── AlertConfiguration.jsx
+│   │   │   │   ├── AlertHistory.jsx
+│   │   │   │   └── NotificationBell.jsx
+│   │   │   └── visualizations/
+│   │   │       ├── ShapForceChart.jsx
+│   │   │       ├── InteractiveMap.jsx
+│   │   │       ├── TimeSeriesChart.jsx
+│   │   │       └── FeatureImportance.jsx
+│   │   ├── pages/                      # Main page components
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── CompanyDeepDive.jsx
+│   │   │   ├── Chatbot.jsx
+│   │   │   ├── AlertConfig.jsx
+│   │   │   └── Analytics.jsx
+│   │   ├── hooks/                      # Custom React hooks
+│   │   │   ├── useWebSocket.js
+│   │   │   ├── useRealTimeData.js
+│   │   │   ├── useChartData.js
+│   │   │   └── useAlerts.js
+│   │   ├── services/                   # API and service calls
+│   │   │   ├── api.js
+│   │   │   ├── websocket.js
+│   │   │   ├── auth.js
+│   │   │   └── charts.js
+│   │   ├── utils/                      # Utility functions
+│   │   │   ├── formatting.js
+│   │   │   ├── calculations.js
+│   │   │   └── constants.js
+│   │   ├── styles/                     # CSS and styling
+│   │   │   ├── globals.css
+│   │   │   ├── components.css
+│   │   │   └── themes.css
+│   │   ├── App.jsx                     # Main App component
+│   │   ├── index.js                    # Entry point
+│   │   └── routes.jsx                  # React Router setup
+│   ├── nginx.conf                      # Nginx configuration
+│   └── .dockerignore
+├── backend/                            # FastAPI Backend Application
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── main.py                         # FastAPI main application
+│   ├── app/
+│   │   ├── __init__.py
+│   │   ├── config.py                   # App configuration
+│   │   ├── database.py                 # Database connections
+│   │   ├── models/                     # Pydantic models
+│   │   │   ├── __init__.py
+│   │   │   ├── company.py
+│   │   │   ├── score.py
+│   │   │   ├── alert.py
+│   │   │   └── data.py
+│   │   ├── api/                        # API routes
+│   │   │   ├── __init__.py
+│   │   │   ├── companies.py
+│   │   │   ├── scores.py
+│   │   │   ├── alerts.py
+│   │   │   ├── chat.py
+│   │   │   └── websocket.py
+│   │   ├── services/                   # Business logic services
+│   │   │   ├── __init__.py
+│   │   │   ├── company_service.py
+│   │   │   ├── score_service.py
+│   │   │   ├── alert_service.py
+│   │   │   ├── chat_service.py
+│   │   │   └── data_service.py
+│   │   ├── middleware/                 # Custom middleware
+│   │   │   ├── __init__.py
+│   │   │   ├── cors.py
+│   │   │   ├── auth.py
+│   │   │   └── logging.py
+│   │   └── utils/                      # Utility functions
+│   │       ├── __init__.py
+│   │       ├── helpers.py
+│   │       ├── validators.py
+│   │       └── exceptions.py
+│   └── .dockerignore
+├── stage1_data_ingestion/              # 🔄 Stage 1: Multilingual Data Ingestion
+│   ├── __init__.py
+│   ├── main_pipeline.py                # ✅ Your existing main pipeline
+│   ├── specialized_scrapers.py         # ✅ Your existing specialized scrapers
+│   ├── scrapers/                       # Organized scraper modules
+│   │   ├── __init__.py
+│   │   ├── news_scrapers.py            # News APIs and RSS
+│   │   ├── social_scrapers.py          # Twitter, Reddit scrapers
+│   │   ├── financial_scrapers.py       # Yahoo Finance, Alpha Vantage
+│   │   ├── regulatory_scrapers.py      # SEC, regulatory data
+│   │   ├── international_scrapers.py   # International news sources
+│   │   └── alternative_scrapers.py     # Satellite, patent, job data
+│   ├── data_processing/
+│   │   ├── __init__.py
+│   │   ├── text_processor.py           # NLP preprocessing
+│   │   ├── language_detector.py        # Language detection
+│   │   ├── entity_extractor.py         # Company/entity extraction
+│   │   └── data_cleaner.py             # Data cleaning utilities
+│   ├── storage/
+│   │   ├── __init__.py
+│   │   ├── s3_manager.py               # S3 data lake operations
+│   │   ├── database_manager.py         # Database operations
+│   │   └── data_models.py              # SQLAlchemy models
+│   ├── config/
+│   │   ├── __init__.py
+│   │   ├── sources_config.py           # Data source configurations
+│   │   └── company_registry.py         # Company registry management
+│   ├── monitoring/
+│   │   ├── __init__.py
+│   │   ├── health_checks.py            # Pipeline health monitoring
+│   │   ├── metrics.py                  # Performance metrics
+│   │   └── alerting.py                 # Pipeline alerting
+│   └── tests/
+│       ├── test_scrapers.py
+│       ├── test_processors.py
+│       └── test_integration.py
+├── stage2_feature_engineering/         # 🧠 Stage 2: Feature Engineering & Sentiment
+│   ├── __init__.py
+│   ├── main_processor.py               # Main feature processing pipeline
+│   ├── nlp/
+│   │   ├── __init__.py
+│   │   ├── sentiment_analyzer.py       # Multi-language sentiment analysis
+│   │   ├── topic_extractor.py          # Topic modeling (LDA, BERT)
+│   │   ├── entity_linker.py            # Entity linking to companies
+│   │   ├── event_detector.py           # Financial event detection
+│   │   └── text_embeddings.py          # Text embeddings (BERT, FinBERT)
+│   ├── financial/
+│   │   ├── __init__.py
+│   │   ├── ratio_calculator.py         # Financial ratio calculations
+│   │   ├── trend_analyzer.py           # Trend analysis algorithms
+│   │   ├── volatility_metrics.py       # Risk/volatility calculations
+│   │   └── market_indicators.py        # Market indicator processing
+│   ├── feature_store/
+│   │   ├── __init__.py
+│   │   ├── feature_store.py            # Feature store implementation
+│   │   ├── feature_registry.py         # Feature metadata registry
+│   │   └── feature_validation.py       # Feature quality validation
+│   ├── aggregation/
+│   │   ├── __init__.py
+│   │   ├── time_series_agg.py          # Time series aggregation
+│   │   ├── cross_sectional_agg.py      # Cross-sectional features
+│   │   └── rolling_metrics.py          # Rolling window calculations
+│   ├── transformers/
+│   │   ├── __init__.py
+│   │   ├── scalers.py                  # Feature scaling/normalization
+│   │   ├── encoders.py                 # Categorical encoding
+│   │   └── feature_selection.py        # Feature selection algorithms
+│   └── tests/
+│       ├── test_nlp.py
+│       ├── test_financial.py
+│       └── test_features.py
+├── stage3_model_training/              # 🎯 Stage 3: ML Training & Real-Time Scoring
+│   ├── __init__.py
+│   ├── training/
+│   │   ├── __init__.py
+│   │   ├── train_pipeline.py           # Main training pipeline
+│   │   ├── model_selection.py          # Model selection & hyperparameter tuning
+│   │   ├── cross_validation.py         # Cross-validation strategies
+│   │   ├── ensemble_methods.py         # Ensemble model implementations
+│   │   └── incremental_learning.py     # Online learning algorithms
+│   ├── models/
+│   │   ├── __init__.py
+│   │   ├── xgboost_model.py           # XGBoost implementation
+│   │   ├── neural_networks.py         # Deep learning models
+│   │   ├── linear_models.py           # Linear/Logistic regression
+│   │   ├── tree_models.py             # Decision tree variants
+│   │   └── ensemble_models.py         # Random Forest, AdaBoost
+│   ├── scoring/
+│   │   ├── __init__.py
+│   │   ├── real_time_scorer.py        # Real-time scoring engine
+│   │   ├── batch_scorer.py            # Batch scoring operations
+│   │   ├── score_calibration.py       # Score calibration methods
+│   │   └── uncertainty_quantification.py # Uncertainty estimation
+│   ├── evaluation/
+│   │   ├── __init__.py
+│   │   ├── model_metrics.py           # Model evaluation metrics
+│   │   ├── backtesting.py             # Backtesting framework
+│   │   ├── stability_tests.py         # Model stability testing
+│   │   └── benchmark_comparison.py    # Comparison with benchmarks
+│   ├── model_registry/
+│   │   ├── __init__.py
+│   │   ├── model_versioning.py        # Model version management
+│   │   ├── model_metadata.py          # Model metadata tracking
+│   │   └── model_deployment.py        # Model deployment utilities
+│   ├── serving/
+│   │   ├── __init__.py
+│   │   ├── model_server.py            # Model serving API
+│   │   ├── prediction_cache.py        # Prediction caching
+│   │   └── load_balancer.py           # Request load balancing
+│   └── tests/
+│       ├── test_training.py
+│       ├── test_models.py
+│       ├── test_scoring.py
+│       └── test_serving.py
+├── stage4_explainability/              # 🗣️ Stage 4: XAI & Chatbot Integration
+│   ├── __init__.py
+│   ├── xai/
+│   │   ├── __init__.py
+│   │   ├── shap_explainer.py          # SHAP-based explanations
+│   │   ├── lime_explainer.py          # LIME explanations
+│   │   ├── feature_attribution.py     # Feature attribution methods
+│   │   ├── counterfactual_analysis.py # Counterfactual explanations
+│   │   └── global_explanations.py     # Global model explanations
+│   ├── chatbot/
+│   │   ├── __init__.py
+│   │   ├── chat_engine.py             # Main chatbot engine
+│   │   ├── intent_classifier.py       # Intent classification
+│   │   ├── entity_recognizer.py       # Named entity recognition
+│   │   ├── response_generator.py      # Response generation
+│   │   ├── context_manager.py         # Conversation context
+│   │   └── knowledge_base.py          # Financial knowledge base
+│   ├── explanation_engine/
+│   │   ├── __init__.py
+│   │   ├── explanation_generator.py   # Generate explanations
+│   │   ├── narrative_builder.py       # Build narrative explanations
+│   │   ├── visualization_data.py      # Data for visualizations
+│   │   └── explanation_cache.py       # Cache explanations
+│   ├── natural_language/
+│   │   ├── __init__.py
+│   │   ├── text_generation.py         # Natural language generation
+│   │   ├── template_engine.py         # Explanation templates
+│   │   └── language_models.py         # Language model integration
+│   ├── simulation/
+│   │   ├── __init__.py
+│   │   ├── what_if_analyzer.py        # What-if scenario analysis
+│   │   ├── sensitivity_analysis.py    # Sensitivity analysis
+│   │   └── scenario_generator.py      # Scenario generation
+│   └── tests/
+│       ├── test_xai.py
+│       ├── test_chatbot.py
+│       └── test_explanations.py
+├── stage5_alerting_workflows/          # 🔔 Stage 5: Alerting & Workflow Integration
+│   ├── __init__.py
+│   ├── monitoring/
+│   │   ├── __init__.py
+│   │   ├── score_monitor.py           # Credit score monitoring
+│   │   ├── threshold_manager.py       # Threshold management
+│   │   ├── anomaly_detector.py        # Anomaly detection
+│   │   └── trend_monitor.py           # Trend monitoring
+│   ├── alerting/
+│   │   ├── __init__.py
+│   │   ├── alert_engine.py            # Main alerting engine
+│   │   ├── rule_engine.py             # Alert rule engine
+│   │   ├── priority_manager.py        # Alert prioritization
+│   │   └── deduplication.py           # Alert deduplication
+│   ├── notifications/
+│   │   ├── __init__.py
+│   │   ├── email_notifier.py          # Email notifications
+│   │   ├── sms_notifier.py            # SMS notifications
+│   │   ├── webhook_notifier.py        # Webhook notifications
+│   │   ├── slack_integration.py       # Slack integration
+│   │   └── teams_integration.py       # Microsoft Teams integration
+│   ├── workflows/
+│   │   ├── __init__.py
+│   │   ├── workflow_engine.py         # Workflow orchestration
+│   │   ├── jira_integration.py        # Jira ticket creation
+│   │   ├── pdf_generator.py           # PDF report generation
+│   │   └── export_manager.py          # Data export utilities
+│   ├── dashboard/
+│   │   ├── __init__.py
+│   │   ├── live_feed.py               # Live alerts feed
+│   │   ├── alert_history.py           # Alert history management
+│   │   └── metrics_collector.py       # Alert metrics collection
+│   └── tests/
+│       ├── test_monitoring.py
+│       ├── test_alerting.py
+│       └── test_workflows.py
+├── shared/                             # Shared utilities and common code
+│   ├── __init__.py
+│   ├── database/
+│   │   ├── __init__.py
+│   │   ├── connections.py             # Database connection management
+│   │   ├── migrations/                # Database migrations
+│   │   └── models/                    # Shared database models
+│   ├── cache/
+│   │   ├── __init__.py
+│   │   ├── redis_client.py            # Redis cache client
+│   │   └── cache_manager.py           # Cache management utilities
+│   ├── messaging/
+│   │   ├── __init__.py
+│   │   ├── kafka_client.py            # Kafka message broker
+│   │   ├── rabbitmq_client.py         # RabbitMQ client
+│   │   └── pub_sub.py                 # Publish-subscribe utilities
+│   ├── monitoring/
+│   │   ├── __init__.py
+│   │   ├── prometheus_metrics.py      # Prometheus metrics
+│   │   ├── health_checks.py           # System health checks
+│   │   └── logging_config.py          # Centralized logging
+│   ├── security/
+│   │   ├── __init__.py
+│   │   ├── authentication.py          # Authentication utilities
+│   │   ├── authorization.py           # Authorization logic
+│   │   └── encryption.py              # Data encryption utilities
+│   └── utils/
+│       ├── __init__.py
+│       ├── date_utils.py              # Date/time utilities
+│       ├── validation.py              # Data validation
+│       ├── serialization.py           # Data serialization
+│       └── constants.py               # Global constants
+├── infrastructure/                     # Infrastructure as Code
+│   ├── docker/
+│   │   ├── docker-compose.dev.yml     # Development environment
+│   │   ├── docker-compose.prod.yml    # Production environment
+│   │   ├── postgres.dockerfile        # PostgreSQL container
+│   │   ├── redis.dockerfile           # Redis container
+│   │   └── nginx.dockerfile           # Nginx container
+│   ├── kubernetes/                    # Kubernetes manifests
+│   │   ├── namespace.yaml
+│   │   ├── configmaps/
+│   │   ├── secrets/
+│   │   ├── deployments/
+│   │   └── services/
+│   ├── terraform/                     # Terraform IaC
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── outputs.tf
+│   │   └── modules/
+│   └── monitoring/
+│       ├── prometheus.yml
+│       ├── grafana/
+│       └── alertmanager.yml
+└── data/                              # Local data storage (development)
+    ├── raw/                           # Raw ingested data
+    ├── processed/                     # Processed feature data
+    ├── models/                        # Saved model artifacts
+    ├── explanations/                  # Cached explanations
+    └── exports/                       # Exported reports and data

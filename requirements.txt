@@ -1,0 +1,51 @@
+# Core dependencies
+asyncio-throttle
+aiohttp
+pandas
+numpy
+sqlalchemy>=2.0.0
+psycopg2-binary
+redis
+
+# AWS
+boto3
+botocore
+
+# Data processing
+beautifulsoup4
+lxml
+feedparser
+langdetect
+textblob
+nltk
+
+# Financial data
+yfinance
+alpha-vantage
+
+# News APIs
+newsapi-python
+
+# Social media
+tweepy
+praw
+
+# Web scraping
+requests
+selenium
+scrapy
+websocket-client
+
+# Monitoring
+prometheus-client
+schedule
+
+# Testing
+pytest
+pytest-asyncio
+pytest-cov
+
+# Utilities
+python-dotenv
+pydantic
+jsonschema
