@@ -1,0 +1,28 @@
+{
+  "newsapi": "your-newsapi-key-here",
+  "alpha_vantage": "your-alpha-vantage-key-here",
+  "twitter": {
+    "bearer_token": "your-twitter-bearer-token-here",
+    "api_key": "your-twitter-api-key-here",
+    "api_secret": "your-twitter-api-secret-here",
+    "access_token": "your-twitter-access-token-here",
+    "access_token_secret": "your-twitter-access-token-secret-here"
+  },
+  "reddit": {
+    "client_id": "your-reddit-client-id-here",
+    "client_secret": "your-reddit-client-secret-here",
+    "user_agent": "CreditIntelligence/1.0"
+  },
+  "openai": "your-openai-api-key-here",
+  "huggingface": "your-huggingface-token-here",
+  "slack": {
+    "webhook_url": "your-slack-webhook-url-here",
+    "bot_token": "your-slack-bot-token-here"
+  },
+  "email": {
+    "smtp_server": "smtp.gmail.com",
+    "smtp_port": 587,
+    "username": "your-email@gmail.com",
+    "password": "your-app-password-here"
+  }
+}

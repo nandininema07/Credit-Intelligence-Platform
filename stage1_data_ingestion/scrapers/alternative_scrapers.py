@@ -1,368 +1,340 @@
-import asyncio
+"""
+Alternative data scrapers for satellite imagery, patent data, job postings, and other non-traditional sources.
+Provides unique insights for credit risk assessment.
+"""
+
 import requests
+import asyncio
+import aiohttp
+from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
-from typing import List, Dict, Any
+from dataclasses import dataclass
 import logging
-from ..data_processing.data_models import DataPoint
+from bs4 import BeautifulSoup
+import json
 
-# alternative_data_scraper.py - Alternative Financial Data Sources
+logger = logging.getLogger(__name__)
 
-class AlternativeDataScraper:
-    def __init__(self):
-        self.session = requests.Session()
-        self.session.headers.update({
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-        })
+@dataclass
+class AlternativeData:
+    """Data class for alternative data sources"""
+    data_type: str
+    company: str
+    content: str
+    source: str
+    collected_date: datetime
+    metadata: Dict[str, Any]
+    confidence_score: Optional[float] = None
+
+@dataclass
+class PatentData:
+    """Data class for patent information"""
+    patent_number: str
+    title: str
+    assignee: str
+    inventors: List[str]
+    filing_date: datetime
+    publication_date: datetime
+    abstract: str
+    classification: str
+    status: str
+
+@dataclass
+class JobPosting:
+    """Data class for job postings"""
+    company: str
+    title: str
+    location: str
+    description: str
+    posted_date: datetime
+    salary_range: Optional[str]
+    requirements: List[str]
+    source: str
+    job_level: Optional[str] = None
+
+class AlternativeScrapers:
+    """Alternative data scrapers for unique insights"""
     
-    def _create_alternative_scraper(self):
-        """Create alternative data scraper"""
-        class AlternativeDataScraper:
-            async def scrape_alternative_data(self, companies: List[str]) -> List[DataPoint]:
-                data_points = []
-                
-                # Satellite data for retail companies
-                retail_companies = ['WMT', 'COST', 'TGT', 'HD']
-                for company in companies:
-                    if company in retail_companies:
-                        data_point = DataPoint(
-                            source_type='satellite_data',
-                            source_name='retail_footfall',
-                            company_ticker=company,
-                            company_name=None,
-                            content_type='alternative_data',
-                            language='en',
-                            title=f'{company} Parking Lot Analysis',
-                            content=f'Satellite imagery analysis showing footfall trends for {company}',
-                            url=None,
-                            published_date=datetime.utcnow(),
-                            metadata={'data_type': 'parking_lot_occupancy', 'locations_analyzed': 50}
-                        )
-                        data_points.append(data_point)
-                
-                # Patent data for tech companies
-                tech_companies = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA']
-                for company in companies:
-                    if company in tech_companies:
-                        data_point = DataPoint(
-                            source_type='patent_data',
-                            source_name='uspto',
-                            company_ticker=company,
-                            company_name=None,
-                            content_type='alternative_data',
-                            language='en',
-                            title=f'{company} Patent Filings',
-                            content=f'Recent patent applications by {company} in AI and technology sectors',
-                            url='https://patents.uspto.gov',
-                            published_date=datetime.utcnow(),
-                            metadata={'data_type': 'patent_filings', 'recent_count': 15}
-                        )
-                        data_points.append(data_point)
-                
-                return data_points
+    def __init__(self, config: Dict[str, Any]):
+        self.config = config
+        self.api_keys = config.get('api_keys', {})
         
-        return AlternativeDataScraper()
-    
-    async def scrape_satellite_data(self, companies: List[str]) -> List[Dict[str, Any]]:
-        """Scrape satellite imagery data for retail/energy companies"""
-        data_points = []
+    async def scrape_satellite_data(self, companies: List[str]) -> List[AlternativeData]:
+        """Scrape satellite data for economic activity indicators"""
+        # Note: This would typically require specialized satellite data APIs
+        satellite_data = []
         
-        # Simulate satellite data (in production, use Planet Labs, Maxar, etc.)
-        retail_companies = ['WMT', 'COST', 'TGT', 'HD', 'LOW']
-        energy_companies = ['XOM', 'CVX', 'COP', 'SLB']
-        
-        for company in companies:
-            if company in retail_companies:
-                # Parking lot analysis for retail
-                data_points.append({
-                    'source_type': 'satellite_data',
-                    'source_name': 'retail_footfall',
-                    'company_ticker': company,
-                    'content_type': 'alternative_data',
-                    'language': 'en',
-                    'title': f'{company} Parking Lot Analysis',
-                    'content': f'Satellite imagery analysis of {company} store locations',
-                    'url': None,
-                    'published_date': datetime.utcnow(),
-                    'metadata': {
-                        'data_type': 'parking_lot_occupancy',
-                        'measurement': 'footfall_proxy',
-                        'locations_analyzed': 100
+        try:
+            # Placeholder for satellite data integration
+            # Real implementation would use APIs like Planet Labs, Maxar, etc.
+            for company in companies:
+                data = AlternativeData(
+                    data_type='satellite',
+                    company=company,
+                    content=f"Satellite activity analysis for {company}",
+                    source='Satellite Provider',
+                    collected_date=datetime.now(),
+                    metadata={
+                        'activity_level': 'moderate',
+                        'facility_count': 5,
+                        'parking_utilization': 0.75
                     }
-                })
+                )
+                satellite_data.append(data)
+                
+            logger.info(f"Collected satellite data for {len(companies)} companies")
+            return satellite_data
             
-            elif company in energy_companies:
-                # Oil storage tank analysis
-                data_points.append({
-                    'source_type': 'satellite_data',
-                    'source_name': 'oil_storage',
-                    'company_ticker': company,
-                    'content_type': 'alternative_data',
-                    'language': 'en',
-                    'title': f'{company} Oil Storage Analysis',
-                    'content': f'Satellite analysis of {company} oil storage facilities',
-                    'url': None,
-                    'published_date': datetime.utcnow(),
-                    'metadata': {
-                        'data_type': 'oil_storage_levels',
-                        'measurement': 'tank_shadows',
-                        'facilities_analyzed': 25
-                    }
-                })
-        
-        return data_points
+        except Exception as e:
+            logger.error(f"Error collecting satellite data: {e}")
+            return []
     
-    async def scrape_shipping_data(self, companies: List[str]) -> List[Dict[str, Any]]:
-        """Scrape shipping and supply chain data"""
-        data_points = []
+    async def scrape_patent_data(self, companies: List[str]) -> List[PatentData]:
+        """Scrape patent data from USPTO"""
+        patents = []
         
-        # Companies with significant shipping/logistics
-        logistics_companies = ['AMZN', 'FDX', 'UPS', 'WMT', 'COST']
-        
-        for company in companies:
-            if company in logistics_companies:
-                try:
-                    # Simulate AIS (Automatic Identification System) data
-                    data_points.append({
-                        'source_type': 'shipping_data',
-                        'source_name': 'ais_tracking',
-                        'company_ticker': company,
-                        'content_type': 'alternative_data',
-                        'language': 'en',
-                        'title': f'{company} Shipping Activity',
-                        'content': f'AIS tracking data for {company} related vessels',
-                        'url': None,
-                        'published_date': datetime.utcnow(),
-                        'metadata': {
-                            'data_type': 'vessel_movements',
-                            'ports_tracked': ['LAX', 'NYC', 'MIA', 'SEA'],
-                            'vessels_count': 50
-                        }
-                    })
-                except Exception as e:
-                    logger.error(f"Error scraping shipping data for {company}: {e}")
-        
-        return data_points
-    
-    async def scrape_patent_data(self, companies: List[str]) -> List[Dict[str, Any]]:
-        """Scrape patent filing data"""
-        data_points = []
-        
-        tech_companies = ['AAPL', 'MSFT', 'GOOGL', 'AMZN', 'META', 'TSLA', 'NVDA']
-        
-        for company in companies:
-            if company in tech_companies:
-                try:
-                    # USPTO patent data (simplified)
-                    company_info = {'AAPL': 'Apple Inc', 'MSFT': 'Microsoft Corporation', 
-                                  'GOOGL': 'Google LLC', 'AMZN': 'Amazon Technologies'}
-                    
-                    if company in company_info:
-                        data_points.append({
-                            'source_type': 'patent_data',
-                            'source_name': 'uspto',
-                            'company_ticker': company,
-                            'content_type': 'alternative_data',
-                            'language': 'en',
-                            'title': f'{company} Recent Patent Filings',
-                            'content': f'Patent applications filed by {company_info[company]}',
-                            'url': 'https://patents.uspto.gov',
-                            'published_date': datetime.utcnow(),
-                            'metadata': {
-                                'data_type': 'patent_filings',
-                                'recent_filings': 25,
-                                'categories': ['AI', 'Hardware', 'Software']
-                            }
-                        })
-                except Exception as e:
-                    logger.error(f"Error scraping patent data for {company}: {e}")
-        
-        return data_points
-    
-    async def scrape_job_postings(self, companies: List[str]) -> List[Dict[str, Any]]:
-        """Scrape job posting data as hiring indicator"""
-        data_points = []
-        
-        for company in companies[:20]:  # Limit to top 20 companies
-            try:
-                # Simulate job posting data from LinkedIn, Indeed, etc.
-                data_points.append({
-                    'source_type': 'job_data',
-                    'source_name': 'linkedin_jobs',
-                    'company_ticker': company,
-                    'content_type': 'alternative_data',
-                    'language': 'en',
-                    'title': f'{company} Job Postings Analysis',
-                    'content': f'Job posting trends for {company}',
-                    'url': None,
-                    'published_date': datetime.utcnow(),
-                    'metadata': {
-                        'data_type': 'job_postings',
-                        'active_postings': 150,
-                        'growth_rate': '5%',
-                        'key_roles': ['Engineering', 'Sales', 'Marketing']
-                    }
-                })
-            except Exception as e:
-                logger.error(f"Error scraping job data for {company}: {e}")
-        
-        return data_points
-    
-# macroeconomic_scraper.py - Macroeconomic Data Sources
-
-class MacroeconomicScraper:
-    def __init__(self, fred_key: str, world_bank_key: str):
-        self.fred_key = fred_key
-        self.world_bank_key = world_bank_key
-        self.indicators = {
-            'US': ['GDP', 'UNRATE', 'CPIAUCSL', 'FEDFUNDS', 'DGS10', 'DEXUSEU'],
-            'EU': ['CLVMNACSCAB1GQEA19', 'LRHUTTTTEZM156S', 'CP0000EZ19M086NEST'],
-            'UK': ['CLVMNACSCAB1GQGB', 'GBRURHARMMDSMEI', 'GBRCPIALLMINMEI'],
-            'JP': ['CLVMNACSCAB1GQJP', 'JPNURHARMMDSMEI', 'JPNCPIALLMINMEI'],
-            'CN': ['CLVMNACSCAB1GQCN', 'CHNURHARMMDSMEI', 'CHNCPIALLMINMEI']
-        }
-    
-    def _create_macro_scraper(self):
-        """Create macroeconomic data scraper"""
-        class MacroeconomicScraper:
-            def __init__(self, fred_key: str):
-                self.fred_key = fred_key
-            
-            async def scrape_economic_indicators(self) -> List[DataPoint]:
-                data_points = []
-                
-                # Key economic indicators
-                indicators = {
-                    'GDP': 'US Gross Domestic Product',
-                    'UNRATE': 'US Unemployment Rate',
-                    'CPIAUCSL': 'US Consumer Price Index',
-                    'FEDFUNDS': 'Federal Funds Rate'
+        try:
+            for company in companies:
+                # USPTO API search
+                url = "https://developer.uspto.gov/ibd-api/v1/patent/application"
+                params = {
+                    'assignee': company,
+                    'limit': 20
                 }
                 
-                for indicator, description in indicators.items():
-                    data_point = DataPoint(
-                        source_type='macroeconomic_data',
-                        source_name='fred',
-                        company_ticker=None,
-                        company_name=None,
-                        content_type='economic_indicator',
-                        language='en',
-                        title=f'{indicator} - {description}',
-                        content=f'Economic indicator {indicator}: {description}',
-                        url=f'https://fred.stlouisfed.org/series/{indicator}',
-                        published_date=datetime.utcnow(),
-                        metadata={'indicator': indicator, 'region': 'US', 'data_source': 'FRED'}
-                    )
-                    data_points.append(data_point)
-                
-                return data_points
-        
-        return MacroeconomicScraper(self.config['apis']['fred_key'])
-    
-    async def scrape_economic_indicators(self, regions: List[str] = None) -> List[Dict[str, Any]]:
-        """Scrape macroeconomic indicators"""
-        if regions is None:
-            regions = ['US', 'EU', 'UK', 'JP', 'CN']
-        
-        data_points = []
-        
-        for region in regions:
-            if region in self.indicators:
-                data_points.extend(await self._scrape_fred_data(region))
-                data_points.extend(await self._scrape_world_bank_data(region))
-        
-        return data_points
-    
-    async def _scrape_fred_data(self, region: str) -> List[Dict[str, Any]]:
-        """Scrape Federal Reserve Economic Data (FRED)"""
-        data_points = []
-        
-        if not self.fred_key:
-            return data_points
-        
-        try:
-            for indicator in self.indicators.get(region, []):
-                url = f"https://api.stlouisfed.org/fred/series/observations?series_id={indicator}&api_key={self.fred_key}&file_type=json&limit=1&sort_order=desc"
-                
-                response = requests.get(url)
-                if response.status_code == 200:
-                    data = response.json()
-                    
-                    if 'observations' in data and data['observations']:
-                        obs = data['observations'][0]
-                        
-                        data_points.append({
-                            'source_type': 'macroeconomic_data',
-                            'source_name': 'fred',
-                            'company_ticker': None,
-                            'content_type': 'economic_indicator',
-                            'language': 'en',
-                            'title': f'{indicator} - {region} Economic Indicator',
-                            'content': f'Economic indicator {indicator} for {region}: {obs["value"]}',
-                            'url': url,
-                            'published_date': datetime.strptime(obs['date'], '%Y-%m-%d') if obs.get('date') else None,
-                            'metadata': {
-                                'indicator': indicator,
-                                'region': region,
-                                'value': obs.get('value'),
-                                'data_source': 'FRED'
-                            }
-                        })
-        
-        except Exception as e:
-            logger.error(f"Error scraping FRED data for {region}: {e}")
-        
-        return data_points
-    
-    async def _scrape_world_bank_data(self, region: str) -> List[Dict[str, Any]]:
-        """Scrape World Bank economic data"""
-        data_points = []
-        
-        try:
-            # World Bank country codes
-            country_codes = {
-                'US': 'USA',
-                'EU': 'EUU',
-                'UK': 'GBR',
-                'JP': 'JPN',
-                'CN': 'CHN'
-            }
-            
-            if region in country_codes:
-                country_code = country_codes[region]
-                
-                # GDP growth, inflation, unemployment
-                indicators = ['NY.GDP.MKTP.KD.ZG', 'FP.CPI.TOTL.ZG', 'SL.UEM.TOTL.ZS']
-                
-                for indicator in indicators:
-                    url = f"https://api.worldbank.org/v2/country/{country_code}/indicator/{indicator}?format=json&date=2023&per_page=1"
-                    
-                    response = requests.get(url)
-                    if response.status_code == 200:
-                        data = response.json()
-                        
-                        if len(data) > 1 and data[1]:
-                            obs = data[1][0]
+                async with aiohttp.ClientSession() as session:
+                    async with session.get(url, params=params) as response:
+                        if response.status == 200:
+                            data = await response.json()
                             
-                            data_points.append({
-                                'source_type': 'macroeconomic_data',
-                                'source_name': 'world_bank',
-                                'company_ticker': None,
-                                'content_type': 'economic_indicator',
-                                'language': 'en',
-                                'title': f'{indicator} - {region} World Bank Data',
-                                'content': f'World Bank indicator {indicator} for {region}: {obs.get("value")}',
-                                'url': url,
-                                'published_date': datetime.strptime(f"{obs['date']}-12-31", '%Y-%m-%d') if obs.get('date') else None,
-                                'metadata': {
-                                    'indicator': indicator,
-                                    'region': region,
-                                    'value': obs.get('value'),
-                                    'data_source': 'World Bank'
-                                }
-                            })
-        
+                            for patent_info in data.get('results', []):
+                                patent = PatentData(
+                                    patent_number=patent_info.get('patentNumber', ''),
+                                    title=patent_info.get('title', ''),
+                                    assignee=patent_info.get('assignee', company),
+                                    inventors=patent_info.get('inventors', []),
+                                    filing_date=datetime.strptime(patent_info.get('filingDate', ''), '%Y-%m-%d') if patent_info.get('filingDate') else datetime.now(),
+                                    publication_date=datetime.strptime(patent_info.get('publicationDate', ''), '%Y-%m-%d') if patent_info.get('publicationDate') else datetime.now(),
+                                    abstract=patent_info.get('abstract', ''),
+                                    classification=patent_info.get('classification', ''),
+                                    status=patent_info.get('status', 'Unknown')
+                                )
+                                patents.append(patent)
+                
+                # Rate limiting
+                await asyncio.sleep(1)
+                
+            logger.info(f"Scraped {len(patents)} patents")
+            return patents
+            
         except Exception as e:
-            logger.error(f"Error scraping World Bank data for {region}: {e}")
+            logger.error(f"Error scraping patent data: {e}")
+            return []
+    
+    async def scrape_job_postings(self, companies: List[str]) -> List[JobPosting]:
+        """Scrape job postings to gauge company growth"""
+        job_postings = []
         
-        return data_points
-
+        try:
+            for company in companies:
+                # LinkedIn Jobs API (requires partnership)
+                # Indeed API (limited access)
+                # For now, using a placeholder approach
+                
+                # Simulate job posting data
+                job_types = ['Software Engineer', 'Data Scientist', 'Product Manager', 'Sales Representative']
+                
+                for job_type in job_types:
+                    posting = JobPosting(
+                        company=company,
+                        title=job_type,
+                        location='Multiple Locations',
+                        description=f"{job_type} position at {company}",
+                        posted_date=datetime.now() - timedelta(days=5),
+                        salary_range='Competitive',
+                        requirements=['Bachelor\'s degree', 'Relevant experience'],
+                        source='Job Board',
+                        job_level='Mid-level'
+                    )
+                    job_postings.append(posting)
+                    
+            logger.info(f"Collected {len(job_postings)} job postings")
+            return job_postings
+            
+        except Exception as e:
+            logger.error(f"Error scraping job postings: {e}")
+            return []
+    
+    async def scrape_supply_chain_data(self, companies: List[str]) -> List[AlternativeData]:
+        """Scrape supply chain and logistics data"""
+        supply_chain_data = []
+        
+        try:
+            for company in companies:
+                # Placeholder for supply chain data
+                # Real implementation would use shipping APIs, port data, etc.
+                data = AlternativeData(
+                    data_type='supply_chain',
+                    company=company,
+                    content=f"Supply chain analysis for {company}",
+                    source='Logistics Provider',
+                    collected_date=datetime.now(),
+                    metadata={
+                        'shipping_volume': 'high',
+                        'delivery_delays': 0.05,
+                        'supplier_diversity': 0.8
+                    }
+                )
+                supply_chain_data.append(data)
+                
+            logger.info(f"Collected supply chain data for {len(companies)} companies")
+            return supply_chain_data
+            
+        except Exception as e:
+            logger.error(f"Error collecting supply chain data: {e}")
+            return []
+    
+    async def scrape_consumer_sentiment(self, companies: List[str]) -> List[AlternativeData]:
+        """Scrape consumer sentiment from review sites"""
+        sentiment_data = []
+        
+        review_sites = {
+            'glassdoor': 'https://www.glassdoor.com/Reviews/',
+            'trustpilot': 'https://www.trustpilot.com/review/',
+            'yelp': 'https://www.yelp.com/biz/'
+        }
+        
+        try:
+            for company in companies:
+                for site, base_url in review_sites.items():
+                    # Simplified scraping approach
+                    company_slug = company.lower().replace(' ', '-')
+                    url = f"{base_url}{company_slug}"
+                    
+                    try:
+                        async with aiohttp.ClientSession() as session:
+                            async with session.get(url) as response:
+                                if response.status == 200:
+                                    html = await response.text()
+                                    soup = BeautifulSoup(html, 'html.parser')
+                                    
+                                    # Extract review data (simplified)
+                                    reviews = soup.find_all('div', class_='review')[:5]
+                                    
+                                    for review in reviews:
+                                        data = AlternativeData(
+                                            data_type='consumer_sentiment',
+                                            company=company,
+                                            content=review.get_text(strip=True)[:500],
+                                            source=site,
+                                            collected_date=datetime.now(),
+                                            metadata={'platform': site}
+                                        )
+                                        sentiment_data.append(data)
+                                        
+                    except Exception as e:
+                        logger.error(f"Error scraping {site} for {company}: {e}")
+                        continue
+                        
+                    # Rate limiting
+                    await asyncio.sleep(2)
+                    
+            logger.info(f"Collected {len(sentiment_data)} consumer sentiment data points")
+            return sentiment_data
+            
+        except Exception as e:
+            logger.error(f"Error collecting consumer sentiment: {e}")
+            return []
+    
+    async def scrape_environmental_data(self, companies: List[str]) -> List[AlternativeData]:
+        """Scrape environmental and ESG data"""
+        environmental_data = []
+        
+        try:
+            for company in companies:
+                # Placeholder for environmental data
+                # Real implementation would use ESG data providers
+                data = AlternativeData(
+                    data_type='environmental',
+                    company=company,
+                    content=f"Environmental impact assessment for {company}",
+                    source='ESG Data Provider',
+                    collected_date=datetime.now(),
+                    metadata={
+                        'carbon_footprint': 'medium',
+                        'sustainability_score': 7.5,
+                        'environmental_violations': 0
+                    }
+                )
+                environmental_data.append(data)
+                
+            logger.info(f"Collected environmental data for {len(companies)} companies")
+            return environmental_data
+            
+        except Exception as e:
+            logger.error(f"Error collecting environmental data: {e}")
+            return []
+    
+    async def scrape_app_store_data(self, companies: List[str]) -> List[AlternativeData]:
+        """Scrape app store ratings and reviews"""
+        app_data = []
+        
+        try:
+            for company in companies:
+                # Placeholder for app store data
+                # Real implementation would use App Store Connect API, Google Play API
+                data = AlternativeData(
+                    data_type='app_performance',
+                    company=company,
+                    content=f"Mobile app performance for {company}",
+                    source='App Store',
+                    collected_date=datetime.now(),
+                    metadata={
+                        'avg_rating': 4.2,
+                        'review_count': 15000,
+                        'download_trend': 'increasing'
+                    }
+                )
+                app_data.append(data)
+                
+            logger.info(f"Collected app data for {len(companies)} companies")
+            return app_data
+            
+        except Exception as e:
+            logger.error(f"Error collecting app store data: {e}")
+            return []
+    
+    async def scrape_all_alternative_sources(self, companies: List[str]) -> Dict[str, Any]:
+        """Scrape all alternative data sources"""
+        results = {}
+        
+        tasks = [
+            self.scrape_satellite_data(companies),
+            self.scrape_patent_data(companies),
+            self.scrape_job_postings(companies),
+            self.scrape_supply_chain_data(companies),
+            self.scrape_consumer_sentiment(companies),
+            self.scrape_environmental_data(companies),
+            self.scrape_app_store_data(companies)
+        ]
+        
+        task_names = [
+            'satellite_data',
+            'patent_data',
+            'job_postings',
+            'supply_chain_data',
+            'consumer_sentiment',
+            'environmental_data',
+            'app_store_data'
+        ]
+        
+        task_results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        for i, result in enumerate(task_results):
+            if isinstance(result, list):
+                results[task_names[i]] = result
+            elif isinstance(result, Exception):
+                logger.error(f"Error in {task_names[i]}: {result}")
+                results[task_names[i]] = []
+                
+        return results
