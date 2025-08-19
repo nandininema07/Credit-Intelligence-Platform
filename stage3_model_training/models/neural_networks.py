@@ -8,7 +8,7 @@ import pandas as pd
 import numpy as np
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers, callbacks
+from keras import layers, callbacks
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import roc_auc_score, classification_report
 import joblib
