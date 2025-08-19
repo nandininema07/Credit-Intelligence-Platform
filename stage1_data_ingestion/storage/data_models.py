@@ -26,7 +26,7 @@ class Company(Base):
     market_cap = Column(BigInteger)
     employees = Column(Integer)
     founded_year = Column(Integer)
-    metadata = Column(JSONB)
+    company_metadata = Column(JSONB)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -46,7 +46,7 @@ class RawData(Base):
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'))
     source = Column(String(100), nullable=False)
     content = Column(JSONB, nullable=False)
-    metadata = Column(JSONB)
+    data_metadata = Column(JSONB)
     created_at = Column(DateTime, default=datetime.utcnow)
     s3_key = Column(String(500))
     language = Column(String(10))
@@ -103,7 +103,7 @@ class Alert(Base):
     description = Column(Text)
     triggered_at = Column(DateTime, default=datetime.utcnow)
     resolved_at = Column(DateTime)
-    metadata = Column(JSONB)
+    alert_metadata = Column(JSONB)
     status = Column(String(20), default='active')
     
     # Relationships

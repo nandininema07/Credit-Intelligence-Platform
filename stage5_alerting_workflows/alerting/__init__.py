@@ -2,12 +2,16 @@
 Alerting module for real-time notifications and alerts.
 """
 
-from .alert_manager import AlertManager
+from .alert_engine import AlertEngine
 from .notification_service import NotificationService
-from .alert_rules import AlertRules
+from .rule_engine import RuleEngine
+from .priority_manager import PriorityManager
+from .deduplication import AlertDeduplicator
 
 __all__ = [
-    'AlertManager',
+    'AlertEngine',
     'NotificationService',
-    'AlertRules'
+    'RuleEngine',
+    'PriorityManager',
+    'AlertDeduplicator'
 ]

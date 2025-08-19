@@ -23,24 +23,70 @@
     "password": null,
     "max_connections": 10
   },
-  "aws": {
-    "region": "us-east-1",
-    "s3_bucket": "credit-intelligence-data",
-    "access_key_id": null,
-    "secret_access_key": null
+  "stage1": {
+    "news_interval": 300,
+    "social_interval": 600,
+    "financial_interval": 900,
+    "regulatory_interval": 3600,
+    "international_interval": 1800,
+    "alternative_interval": 7200,
+    "health_check_interval": 300,
+    "metrics_interval": 60,
+    "postgres": {
+      "postgres_host": "localhost",
+      "postgres_port": 5432,
+      "postgres_database": "credit_intelligence",
+      "postgres_user": "postgres",
+      "postgres_password": "password"
+    },
+    "api_keys": {
+      "newsapi": "your-newsapi-key",
+      "twitter": "your-twitter-bearer-token",
+      "alpha_vantage": "your-alpha-vantage-key"
+    }
   },
-  "models": {
+  "stage2": {
+    "processing_interval": 600,
+    "batch_size": 100,
+    "feature_window_days": 30,
+    "nlp_models": {
+      "sentiment_model": "cardiffnlp/twitter-roberta-base-sentiment-latest",
+      "embedding_model": "sentence-transformers/all-MiniLM-L6-v2"
+    },
+    "financial_ratios": {
+      "liquidity_ratios": ["current_ratio", "quick_ratio", "cash_ratio"],
+      "profitability_ratios": ["roa", "roe", "profit_margin", "ebitda_margin"],
+      "leverage_ratios": ["debt_to_equity", "debt_to_assets", "interest_coverage"],
+      "efficiency_ratios": ["asset_turnover", "inventory_turnover", "receivables_turnover"]
+    }
+  },
+  "stage3": {
+    "training_interval": 3600,
+    "model_types": ["xgboost", "lightgbm", "random_forest"],
     "default_model": "xgboost",
     "model_path": "./models/",
     "feature_store_path": "./feature_store/",
     "batch_size": 32,
     "timeout_seconds": 300,
     "auto_retrain": true,
-    "retrain_threshold": 0.05
+    "retrain_threshold": 0.05,
+    "validation_split": 0.2,
+    "cross_validation_folds": 5,
+    "hyperparameter_tuning": true
   },
-  "alerting": {
-    "enabled": true,
-    "notification_channels": ["email", "slack"],
+  "stage4": {
+    "explanation_interval": 1800,
+    "explainer_types": ["shap", "lime", "permutation"],
+    "default_explainer": "shap",
+    "max_features_explain": 20,
+    "explanation_cache_ttl": 3600,
+    "openai_api_key": "your-openai-api-key",
+    "chat_model": "gpt-3.5-turbo",
+    "max_chat_history": 10
+  },
+  "stage5": {
+    "alert_check_interval": 60,
+    "notification_channels": ["email", "slack", "teams"],
     "cooldown_minutes": 60,
     "max_alerts_per_hour": 100,
     "severity_thresholds": {
@@ -48,13 +94,34 @@
       "high": 500,
       "medium": 600,
       "low": 700
+    },
+    "email": {
+      "smtp_host": "smtp.gmail.com",
+      "smtp_port": 587,
+      "smtp_username": "your-email@gmail.com",
+      "smtp_password": "your-app-password",
+      "use_tls": true
+    },
+    "slack": {
+      "bot_token": "xoxb-your-slack-bot-token",
+      "webhook_url": "https://hooks.slack.com/services/your/webhook/url",
+      "default_channel": "#alerts"
+    },
+    "teams": {
+      "webhook_url": "https://your-org.webhook.office.com/webhookb2/your-webhook-url"
+    },
+    "jira": {
+      "url": "https://your-org.atlassian.net",
+      "username": "your-jira-email@example.com",
+      "api_token": "your-jira-api-token",
+      "project_key": "CREDIT"
     }
   },
-  "workflows": {
-    "max_concurrent_workflows": 5,
-    "default_timeout_minutes": 30,
-    "retry_attempts": 3,
-    "cleanup_completed_after_hours": 24
+  "aws": {
+    "region": "us-east-1",
+    "s3_bucket": "credit-intelligence-data",
+    "access_key_id": null,
+    "secret_access_key": null
   },
   "api": {
     "host": "0.0.0.0",

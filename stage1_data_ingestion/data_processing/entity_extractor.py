@@ -7,9 +7,16 @@ import asyncio
 import logging
 import re
 from typing import List, Dict, Any, Optional, Tuple
-import spacy
-from spacy.matcher import Matcher
-import pandas as pd
+try:
+    import spacy
+    from spacy.matcher import Matcher
+except ImportError:
+    spacy = None
+    Matcher = None
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 from datetime import datetime
 
 logger = logging.getLogger(__name__)
@@ -27,6 +34,10 @@ class EntityExtractor:
     async def initialize(self):
         """Initialize entity extraction models"""
         try:
+            if not spacy:
+                logger.warning("spaCy not available, using basic entity extraction")
+                return
+                
             # Load spaCy models for different languages
             models_to_load = self.config.get('spacy_models', {
                 'en': 'en_core_web_sm',
@@ -41,9 +52,10 @@ class EntityExtractor:
                     self.nlp_models[lang] = nlp
                     
                     # Initialize matcher for this language
-                    matcher = Matcher(nlp.vocab)
-                    self._add_financial_patterns(matcher, lang)
-                    self.matchers[lang] = matcher
+                    if Matcher:
+                        matcher = Matcher(nlp.vocab)
+                        self._add_financial_patterns(matcher, lang)
+                        self.matchers[lang] = matcher
                     
                 except OSError:
                     logger.warning(f"spaCy model {model_name} not found for language {lang}")
@@ -52,7 +64,7 @@ class EntityExtractor:
             
         except Exception as e:
             logger.error(f"Error initializing entity extractor: {e}")
-            raise
+            # Continue with basic functionality instead of raising
     
     def _load_financial_entities(self) -> Dict[str, List[str]]:
         """Load known financial entities and patterns"""
@@ -67,8 +79,8 @@ class EntityExtractor:
                 'Wells Fargo', 'Bank of America', 'Deutsche Bank', 'UBS'
             ],
             'rating_agencies': [
-                'Moody\\'s', 'S&P', 'Fitch', 'Standard & Poor\\'s',
-                'Moody\\'s Investors Service', 'Fitch Ratings'
+                "Moody's", 'S&P', 'Fitch', "Standard & Poor's",
+                "Moody's Investors Service", 'Fitch Ratings'
             ],
             'regulatory_bodies': [
                 'SEC', 'FINRA', 'CFTC', 'FCA', 'BaFin', 'ASIC', 'SEBI',

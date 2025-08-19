@@ -1,87 +1,92 @@
-# Core dependencies
-asyncio-throttle
-aiohttp
-pandas>=1.5.0
-numpy>=1.21.0
-sqlalchemy>=2.0.0
+# Core Framework
+asyncio
+asyncpg
+pandas
+numpy
+sqlalchemy
 psycopg2-binary
 redis
 asyncpg
 
 # Database
-psycopg2-binary>=2.9.0
-asyncpg>=0.28.0
+psycopg2-binary
+asyncpg
+boto3
 
 # Machine Learning
-scikit-learn>=1.2.0
-xgboost>=1.7.0
-lightgbm>=3.3.0
-transformers>=4.20.0
-torch>=1.12.0
-sentence-transformers>=2.2.0
-tensorflow>=2.8.0
-lightgbm>=3.3.0
+scikit-learn
+xgboost
+lightgbm
+transformers
+torch
+sentence-transformers
+tensorflow
+lightgbm
 fuzzywuzzy
 spacy
 aiofiles
 asyncpg
 tensorflow.keras
 keras_tuner
+tf-keras
+seaborn
 
 # NLP
-spacy>=3.4.0
-textblob>=0.17.0
-nltk>=3.7
-vaderSentiment>=3.3.0
-fuzzywuzzy>=0.18.0
-python-Levenshtein>=0.20.0
+spacy
+textblob
+nltk
+vaderSentiment
+fuzzywuzzy
+python-Levenshtein
 
 # Explainability
-shap>=0.41.0
-lime>=0.2.0
+shap
+lime
 
 # Data processing
-beautifulsoup4>=4.11.0
-lxml>=4.9.0
-feedparser>=6.0.0
+beautifulsoup4
+lxml
+feedparser
 langdetect>=1.0.9
 
 # Financial data
-yfinance>=0.2.0
-alpha-vantage>=2.3.0
+yfinance
+alpha-vantage
 
 # News APIs
-newsapi-python>=0.2.6
+newsapi-python
 
 # Social media
-tweepy>=4.14.0
-praw>=7.6.0
+tweepy
+praw
 
 # Web scraping
-requests>=2.28.0
-selenium>=4.5.0
-scrapy>=2.6.0
-websocket-client>=1.4.0
+requests
+selenium
+scrapy
+websocket-client==1.4.0
 
 # Security
-cryptography>=3.4.0
-PyJWT>=2.4.0
+cryptography
+PyJWT
 
 # Monitoring
-prometheus-client>=0.14.0
-schedule>=1.2.0
+prometheus-client
+schedule
 
 # Configuration
-PyYAML>=6.0
+PyYAML
 
 # Testing
-pytest>=7.1.0
-pytest-asyncio>=0.21.0
-pytest-cov>=4.0.0
+pytest
+pytest-asyncio
+pytest-cov
 optuna
+psutil
 
 # Utilities
-python-dotenv>=0.20.0
-pydantic>=1.10.0
-jsonschema>=4.16.0
-joblib>=1.2.0
+python-dotenv
+pydantic
+jsonschema
+joblib
+openai

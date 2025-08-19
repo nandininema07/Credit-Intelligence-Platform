@@ -31,7 +31,7 @@ class ValidationResult:
     details: Dict[str, Any]
     timestamp: datetime
 
-class FeatureValidator:
+class FeatureValidation:
     """Feature validation engine"""
     
     def __init__(self, config: Dict[str, Any]):

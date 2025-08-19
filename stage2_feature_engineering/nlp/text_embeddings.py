@@ -7,9 +7,20 @@ import asyncio
 import logging
 from typing import List, Dict, Any, Optional, Union
 import numpy as np
-import torch
-from transformers import AutoTokenizer, AutoModel, AutoConfig
-from sentence_transformers import SentenceTransformer
+try:
+    import torch
+except ImportError:
+    torch = None
+try:
+    from transformers import AutoTokenizer, AutoModel, AutoConfig
+except ImportError:
+    AutoTokenizer = None
+    AutoModel = None
+    AutoConfig = None
+try:
+    from sentence_transformers import SentenceTransformer
+except ImportError:
+    SentenceTransformer = None
 import pickle
 from datetime import datetime
 import os
@@ -23,12 +34,16 @@ class TextEmbeddings:
         self.config = config
         self.models = {}
         self.tokenizers = {}
-        self.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+        self.device = torch.device('cuda' if torch and torch.cuda.is_available() else 'cpu') if torch else None
         self.initialize_models()
         
     def initialize_models(self):
         """Initialize embedding models"""
         try:
+            if not AutoModel or not AutoTokenizer:
+                logger.warning("Transformers not available, using basic embeddings")
+                return
+                
             # FinBERT for financial text
             if self.config.get('use_finbert', True):
                 try:

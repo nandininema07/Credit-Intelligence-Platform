@@ -24,7 +24,7 @@ class ModelConfig:
     cv_folds: int = 5
     scoring: str = 'roc_auc'
 
-class ModelSelector:
+class ModelSelection:
     """Automated model selection and hyperparameter tuning"""
     
     def __init__(self, config: Dict[str, Any]):

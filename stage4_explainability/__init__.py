@@ -1,9 +1,11 @@
 """
-Stage 4: Explainability & Chatbot Integration
-Model explainability, SHAP analysis, and chatbot integration for credit decisions.
+Stage 4: Explainable AI (XAI) & Chatbot Integration
 """
 
-from .explainer.shap_explainer import SHAPExplainer
-from .chatbot.credit_chatbot import CreditChatbot
+from .xai import *
+from .chatbot import *
+from .explainer import *
+from .natural_language import *
+from .simulation import *
 
-__all__ = ['SHAPExplainer', 'CreditChatbot']
+__version__ = "1.0.0"

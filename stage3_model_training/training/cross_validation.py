@@ -25,7 +25,7 @@ class CVResult:
     fold_details: List[Dict[str, Any]]
     strategy: str
     
-class CrossValidator:
+class CrossValidation:
     """Advanced cross-validation strategies for credit risk models"""
     
     def __init__(self, config: Dict[str, Any]):

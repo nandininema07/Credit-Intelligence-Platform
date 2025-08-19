@@ -5,7 +5,7 @@ Handles scaling, normalization, encoding, and feature selection.
 
 from .scalers import FeatureScaler
 from .encoders import CategoricalEncoder
-from .selectors import FeatureSelector
+from .feature_selection import FeatureSelector
 from .normalizers import FeatureNormalizer
 
 __all__ = [

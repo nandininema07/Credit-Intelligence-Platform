@@ -1,13 +1,15 @@
 """
-Explainer module for model interpretability and explanation.
+Explanation engine module for Stage 4 explainability.
 """
 
-from .shap_explainer import SHAPExplainer
-from .lime_explainer import LIMEExplainer
-from .feature_importance import FeatureImportanceAnalyzer
+from .explanation_generator import ExplanationGenerator
+from .narrative_builder import NarrativeBuilder
+from .visualization_data import VisualizationDataGenerator
+from .explanation_cache import ExplanationCache
 
 __all__ = [
-    'SHAPExplainer',
-    'LIMEExplainer',
-    'FeatureImportanceAnalyzer'
+    'ExplanationGenerator',
+    'NarrativeBuilder',
+    'VisualizationDataGenerator',
+    'ExplanationCache'
 ]

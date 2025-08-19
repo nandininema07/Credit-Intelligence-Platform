@@ -7,11 +7,21 @@ import asyncio
 import logging
 import re
 from typing import List, Dict, Any, Optional
-import spacy
-import nltk
-from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize, sent_tokenize
-from nltk.stem import WordNetLemmatizer
+try:
+    import spacy
+except ImportError:
+    spacy = None
+try:
+    import nltk
+    from nltk.corpus import stopwords
+    from nltk.tokenize import word_tokenize, sent_tokenize
+    from nltk.stem import WordNetLemmatizer
+except ImportError:
+    nltk = None
+    stopwords = None
+    word_tokenize = None
+    sent_tokenize = None
+    WordNetLemmatizer = None
 import string
 
 logger = logging.getLogger(__name__)
@@ -26,41 +36,53 @@ class TextProcessor:
         self.financial_terms = self._load_financial_terms()
         
     async def initialize(self):
-        """Initialize NLP models and download required resources"""
+        """Initialize NLP models and download required data"""
         try:
-            # Download NLTK data
-            nltk.download('punkt', quiet=True)
-            nltk.download('stopwords', quiet=True)
-            nltk.download('wordnet', quiet=True)
-            nltk.download('averaged_perceptron_tagger', quiet=True)
-            
-            # Load spaCy models for different languages
-            models_to_load = self.config.get('spacy_models', {
-                'en': 'en_core_web_sm',
-                'es': 'es_core_news_sm',
-                'fr': 'fr_core_news_sm',
-                'de': 'de_core_news_sm',
-                'zh': 'zh_core_web_sm'
-            })
-            
-            for lang, model_name in models_to_load.items():
+            # Download NLTK data if needed and available
+            if nltk:
                 try:
-                    self.nlp_models[lang] = spacy.load(model_name)
-                except OSError:
-                    logger.warning(f"spaCy model {model_name} not found for language {lang}")
-                    # Fallback to basic English model
-                    if lang != 'en':
-                        try:
-                            self.nlp_models[lang] = spacy.load('en_core_web_sm')
-                        except OSError:
-                            logger.warning(f"Fallback English model also not available")
+                    nltk.download('punkt', quiet=True)
+                    nltk.download('stopwords', quiet=True)
+                    nltk.download('wordnet', quiet=True)
+                    nltk.download('averaged_perceptron_tagger', quiet=True)
+                    
+                    # Initialize lemmatizer
+                    if WordNetLemmatizer:
+                        self.lemmatizer = WordNetLemmatizer()
+                except Exception as e:
+                    logger.warning(f"NLTK initialization failed: {e}")
+                    self.lemmatizer = None
+            else:
+                logger.warning("NLTK not available, using basic text processing")
+                self.lemmatizer = None
             
+            # Load spaCy models for different languages if available
+            if spacy:
+                models_to_load = self.config.get('nlp_models', ['en_core_web_sm'])
+                
+                for model_name in models_to_load:
+                    try:
+                        self.nlp_models[model_name] = spacy.load(model_name)
+                        logger.info(f"Loaded spaCy model: {model_name}")
+                    except OSError:
+                        logger.warning(f"spaCy model {model_name} not found. Install with: python -m spacy download {model_name}")
+                
+                # Set default model
+                if self.nlp_models:
+                    self.default_nlp = list(self.nlp_models.values())[0]
+                else:
+                    self.default_nlp = None
+                    logger.warning("No spaCy models available")
+            else:
+                logger.warning("spaCy not available, using basic text processing")
+                self.default_nlp = None
+                
             logger.info("Text processor initialized successfully")
             
         except Exception as e:
             logger.error(f"Error initializing text processor: {e}")
-            raise
-    
+            # Continue with basic functionality
+            
     def _load_financial_terms(self) -> Dict[str, List[str]]:
         """Load financial terminology for domain-specific processing"""
         return {

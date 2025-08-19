@@ -63,6 +63,197 @@ class MainProcessor:
         # Feature Store and Aggregation
         self.feature_store = FeatureStore(self.config.get('feature_store', {}))
         self.time_series_agg = TimeSeriesAggregator(self.config.get('aggregation', {}))
+        self.feature_scaler = FeatureScaler(self.config.get('scaling', {}))
+        
+        logger.info("Feature processing components initialized")
+    
+    async def initialize(self):
+        """Initialize all components asynchronously"""
+        try:
+            await self.feature_store.initialize()
+            await self.sentiment_analyzer.initialize()
+            await self.text_embeddings.initialize()
+            logger.info("Stage 2 Feature Engineering initialized successfully")
+        except Exception as e:
+            logger.error(f"Error initializing Stage 2: {e}")
+            raise
+    
+    async def process_company_features(self, company_name: str) -> Dict[str, float]:
+        """Process features for a specific company"""
+        try:
+            start_time = datetime.now()
+            features = {}
+            errors = []
+            
+            # Get raw data from Stage 1
+            raw_data = await self._get_company_raw_data(company_name)
+            
+            if not raw_data:
+                logger.warning(f"No raw data found for {company_name}")
+                return {}
+            
+            # Process NLP features
+            nlp_features = await self._process_nlp_features(raw_data.get('text_data', []))
+            features.update(nlp_features)
+            
+            # Process financial features
+            financial_features = await self._process_financial_features(raw_data.get('financial_data', []))
+            features.update(financial_features)
+            
+            # Process market features
+            market_features = await self._process_market_features(raw_data.get('market_data', []))
+            features.update(market_features)
+            
+            # Apply time series aggregation
+            aggregated_features = await self.time_series_agg.aggregate_features(features, company_name)
+            features.update(aggregated_features)
+            
+            # Scale features
+            scaled_features = await self.feature_scaler.scale_features(features)
+            
+            # Store features
+            await self.feature_store.store_features(company_name, scaled_features)
+            
+            processing_time = (datetime.now() - start_time).total_seconds()
+            
+            result = ProcessingResult(
+                company=company_name,
+                features=scaled_features,
+                metadata={
+                    'processing_time': processing_time,
+                    'feature_count': len(scaled_features),
+                    'data_sources': list(raw_data.keys())
+                },
+                processing_time=processing_time,
+                success=True,
+                errors=errors
+            )
+            
+            logger.info(f"Processed {len(scaled_features)} features for {company_name} in {processing_time:.2f}s")
+            return scaled_features
+            
+        except Exception as e:
+            logger.error(f"Error processing features for {company_name}: {e}")
+            return {}
+    
+    async def _get_company_raw_data(self, company_name: str) -> Dict[str, Any]:
+        """Get raw data for company from Stage 1"""
+        # This would connect to Stage 1's storage
+        # For now, return mock data structure
+        return {
+            'text_data': [],
+            'financial_data': [],
+            'market_data': []
+        }
+    
+    async def _process_nlp_features(self, text_data: List[Dict]) -> Dict[str, float]:
+        """Process NLP features from text data"""
+        features = {}
+        
+        if not text_data:
+            return features
+        
+        try:
+            # Sentiment analysis
+            sentiments = await self.sentiment_analyzer.analyze_batch(text_data)
+            features['sentiment_avg'] = np.mean([s['score'] for s in sentiments])
+            features['sentiment_std'] = np.std([s['score'] for s in sentiments])
+            
+            # Topic extraction
+            topics = await self.topic_extractor.extract_topics(text_data)
+            for i, topic_score in enumerate(topics[:5]):  # Top 5 topics
+                features[f'topic_{i}_score'] = topic_score
+            
+            # Entity linking
+            entities = await self.entity_linker.link_entities(text_data)
+            features['entity_count'] = len(entities)
+            features['entity_confidence_avg'] = np.mean([e['confidence'] for e in entities]) if entities else 0
+            
+            # Event detection
+            events = await self.event_detector.detect_events(text_data)
+            features['event_count'] = len(events)
+            features['critical_event_count'] = len([e for e in events if e.get('severity') == 'critical'])
+            
+        except Exception as e:
+            logger.error(f"Error processing NLP features: {e}")
+        
+        return features
+    
+    async def _process_financial_features(self, financial_data: List[Dict]) -> Dict[str, float]:
+        """Process financial features"""
+        features = {}
+        
+        if not financial_data:
+            return features
+        
+        try:
+            # Financial ratios
+            ratios = await self.ratio_calculator.calculate_ratios(financial_data)
+            features.update(ratios)
+            
+            # Trend analysis
+            trends = await self.trend_analyzer.analyze_trends(financial_data)
+            features.update(trends)
+            
+            # Volatility metrics
+            volatility = await self.volatility_metrics.calculate_volatility(financial_data)
+            features.update(volatility)
+            
+        except Exception as e:
+            logger.error(f"Error processing financial features: {e}")
+        
+        return features
+    
+    async def _process_market_features(self, market_data: List[Dict]) -> Dict[str, float]:
+        """Process market-based features"""
+        features = {}
+        
+        if not market_data:
+            return features
+        
+        try:
+            # Market indicators
+            indicators = await self.market_indicators.calculate_indicators(market_data)
+            features.update(indicators)
+            
+        except Exception as e:
+            logger.error(f"Error processing market features: {e}")
+        
+        return features
+    
+    async def get_processing_status(self) -> Dict[str, Any]:
+        """Get current processing status"""
+        return {
+            'healthy': True,
+            'components_initialized': True,
+            'feature_store_connected': await self.feature_store.is_connected(),
+            'last_processing_time': datetime.now(),
+            'processed_companies_count': await self.feature_store.get_company_count()
+        }
+    
+    async def cleanup(self):
+        """Cleanup resources"""
+        try:
+            if self.feature_store:
+                await self.feature_store.close()
+            logger.info("Stage 2 cleanup completed")
+        except Exception as e:
+            logger.error(f"Error during Stage 2 cleanup: {e}")
+        self.sentiment_analyzer = SentimentAnalyzer(self.config.get('nlp', {}))
+        self.topic_extractor = TopicExtractor(self.config.get('nlp', {}))
+        self.entity_linker = EntityLinker(self.config.get('nlp', {}))
+        self.event_detector = EventDetector(self.config.get('nlp', {}))
+        self.text_embeddings = TextEmbeddings(self.config.get('nlp', {}))
+        
+        # Financial Components
+        self.ratio_calculator = RatioCalculator(self.config.get('financial', {}))
+        self.trend_analyzer = TrendAnalyzer(self.config.get('financial', {}))
+        self.volatility_metrics = VolatilityMetrics(self.config.get('financial', {}))
+        self.market_indicators = MarketIndicators(self.config.get('financial', {}))
+        
+        # Feature Store and Aggregation
+        self.feature_store = FeatureStore(self.config.get('feature_store', {}))
+        self.time_series_agg = TimeSeriesAggregator(self.config.get('aggregation', {}))
         self.feature_scaler = FeatureScaler(self.config.get('transformers', {}))
         
         logger.info("Feature processing components initialized")

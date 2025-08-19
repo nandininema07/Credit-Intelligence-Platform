@@ -14,37 +14,43 @@ class ConfigManager:
     """Configuration manager for application settings"""
     
     def __init__(self, config_path: str = None):
-        self.config_path = config_path or os.path.join(os.getcwd(), 'config')
+        if config_path and os.path.isfile(config_path):
+            # Single config file path
+            self.config_file = config_path
+            self.config_path = os.path.dirname(config_path)
+        else:
+            # Config directory path
+            self.config_path = config_path or os.path.join(os.getcwd(), 'config')
+            self.config_file = os.path.join(self.config_path, 'config.json')
+        
         self.config_data = {}
         self._load_configs()
     
     def _load_configs(self):
         """Load configuration files"""
-        config_files = [
-            'config.json',
-            'database.json', 
-            'api_keys.json',
-            'model_config.yaml',
-            'alert_rules.json'
-        ]
+        # Load main config file
+        if os.path.exists(self.config_file):
+            try:
+                with open(self.config_file, 'r') as f:
+                    self.config_data = json.load(f)
+                logger.info(f"Loaded main config: {self.config_file}")
+            except Exception as e:
+                logger.error(f"Error loading main config: {e}")
         
-        for config_file in config_files:
+        # Load additional config files if they exist
+        additional_configs = ['api_keys.json']
+        for config_file in additional_configs:
             file_path = os.path.join(self.config_path, config_file)
             if os.path.exists(file_path):
                 try:
-                    if config_file.endswith('.json'):
-                        with open(file_path, 'r') as f:
-                            data = json.load(f)
-                    elif config_file.endswith('.yaml') or config_file.endswith('.yml'):
-                        with open(file_path, 'r') as f:
-                            data = yaml.safe_load(f)
-                    
+                    with open(file_path, 'r') as f:
+                        data = json.load(f)
+                    # Merge with main config
                     config_name = config_file.split('.')[0]
                     self.config_data[config_name] = data
-                    logger.info(f"Loaded config: {config_file}")
-                    
+                    logger.info(f"Loaded additional config: {config_file}")
                 except Exception as e:
-                    logger.error(f"Error loading config {config_file}: {str(e)}")
+                    logger.error(f"Error loading config {config_file}: {e}")
     
     def get(self, key: str, default: Any = None) -> Any:
         """Get configuration value by key"""
@@ -58,6 +64,10 @@ class ConfigManager:
         except (KeyError, TypeError):
             return default
     
+    def get_config(self) -> Dict[str, Any]:
+        """Get complete configuration"""
+        return self.config_data
+    
     def get_database_config(self) -> Dict[str, Any]:
         """Get database configuration"""
         return self.config_data.get('database', {
@@ -70,12 +80,21 @@ class ConfigManager:
     
     def get_api_key(self, service: str) -> Optional[str]:
         """Get API key for external service"""
+        # Check stage1 api_keys first, then root level, then environment
+        stage1_keys = self.config_data.get('stage1', {}).get('api_keys', {})
         api_keys = self.config_data.get('api_keys', {})
-        return api_keys.get(service) or os.getenv(f"{service.upper()}_API_KEY")
+        
+        return (stage1_keys.get(service) or 
+                api_keys.get(service) or 
+                os.getenv(f"{service.upper()}_API_KEY"))
+    
+    def get_stage_config(self, stage: str) -> Dict[str, Any]:
+        """Get configuration for specific stage"""
+        return self.config_data.get(stage, {})
     
     def get_model_config(self) -> Dict[str, Any]:
         """Get model configuration"""
-        return self.config_data.get('model_config', {
+        return self.config_data.get('stage3', {
             'default_model': 'xgboost',
             'model_path': './models/',
             'feature_store_path': './feature_store/',
@@ -85,7 +104,7 @@ class ConfigManager:
     
     def get_alert_config(self) -> Dict[str, Any]:
         """Get alerting configuration"""
-        return self.config_data.get('alert_rules', {
+        return self.config_data.get('stage5', {
             'enabled': True,
             'notification_channels': ['email', 'slack'],
             'cooldown_minutes': 60,

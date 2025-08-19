@@ -2,12 +2,18 @@
 Chatbot module for credit decision explanations and interactions.
 """
 
-from .credit_chatbot import CreditChatbot
-from .conversation_manager import ConversationManager
+from .chat_engine import ChatEngine
+from .intent_classifier import IntentClassifier
+from .entity_recognizer import EntityRecognizer
 from .response_generator import ResponseGenerator
+from .context_manager import ContextManager
+from .knowledge_base import KnowledgeBase
 
 __all__ = [
-    'CreditChatbot',
-    'ConversationManager',
-    'ResponseGenerator'
+    'ChatEngine',
+    'IntentClassifier',
+    'EntityRecognizer',
+    'ResponseGenerator',
+    'ContextManager',
+    'KnowledgeBase'
 ]
