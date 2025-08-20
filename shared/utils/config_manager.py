@@ -75,7 +75,7 @@ class ConfigManager:
             'port': 5432,
             'database': 'credit_intelligence',
             'user': 'postgres',
-            'password': 'password'
+            'password': '@nandiniPOSTGRES23'
         })
     
     def get_api_key(self, service: str) -> Optional[str]:
