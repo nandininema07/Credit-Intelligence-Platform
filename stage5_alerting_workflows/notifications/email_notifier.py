@@ -156,18 +156,38 @@ class EmailNotifier:
             }
         }
     
-    async def send_alert_notification(self, alert_data: Dict[str, Any], 
-                                    recipients: List[str]) -> bool:
+    async def send_alert_notification(self, alert: Dict[str, Any]) -> bool:
         """Send alert notification email"""
-        
         try:
-            template_data = self._prepare_alert_template_data(alert_data)
+            # Get alert template data
+            template_data = {
+                'title': alert.get('title', 'Credit Alert'),
+                'company_id': alert.get('company_id', 'Unknown'),
+                'severity': alert.get('severity', 'Medium'),
+                'factor': alert.get('factor', 'Unknown'),
+                'current_value': alert.get('current_value', 'N/A'),
+                'threshold_value': alert.get('threshold_value', 'N/A'),
+                'description': alert.get('description', 'No description available'),
+                'created_at': alert.get('created_at', datetime.now().strftime('%Y-%m-%d %H:%M:%S')),
+                'color': self._get_severity_color(alert.get('severity', 'Medium'))
+            }
             
-            return await self.send_email(
+            # Get recipients from config or use default
+            recipients = self.config.get('alert_recipients', ['admin@credtech.com'])
+            
+            # Send email
+            success = await self.send_email(
                 recipients=recipients,
                 template='alert_created',
                 template_data=template_data
             )
+            
+            if success:
+                logger.info(f"Alert notification sent for {alert.get('company_id', 'Unknown')}")
+            else:
+                logger.error(f"Failed to send alert notification for {alert.get('company_id', 'Unknown')}")
+            
+            return success
             
         except Exception as e:
             logger.error(f"Error sending alert notification: {e}")
@@ -484,3 +504,10 @@ class EmailNotifier:
         except Exception as e:
             logger.error(f"Error getting statistics: {e}")
             return {'error': str(e)}
+
+    async def process_queue(self):
+        """Process email notification queue - placeholder for compatibility"""
+        # This method is called by AlertingEngine but EmailNotifier doesn't use a queue
+        # All emails are sent immediately when send_email is called
+        logger.debug("EmailNotifier process_queue called - no queue processing needed")
+        return True

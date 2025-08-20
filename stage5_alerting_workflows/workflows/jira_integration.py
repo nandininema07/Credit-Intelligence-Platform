@@ -422,23 +422,20 @@ class JiraIntegration:
             logger.error(f"Error testing Jira connection: {e}")
             return False
     
-    async def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> Dict[str, Any]:
         """Get Jira integration statistics"""
-        
         try:
             stats = self.statistics.copy()
             
             # Calculate success rate
-            total_attempts = stats['tickets_created'] + stats['tickets_failed']
-            success_rate = (stats['tickets_created'] / total_attempts * 100) if total_attempts > 0 else 0
+            total_attempts = stats['tickets_created'] + stats['tickets_updated'] + stats['tickets_failed']
+            success_rate = ((stats['tickets_created'] + stats['tickets_updated']) / total_attempts * 100) if total_attempts > 0 else 0
             
             stats.update({
                 'total_attempts': total_attempts,
                 'success_rate': round(success_rate, 2),
                 'base_url': self.base_url,
-                'project_key': self.project_key,
-                'default_issue_type': self.default_issue_type,
-                'authentication_configured': bool(self.auth_header)
+                'project_key': self.project_key
             })
             
             return stats
@@ -446,3 +443,10 @@ class JiraIntegration:
         except Exception as e:
             logger.error(f"Error getting statistics: {e}")
             return {'error': str(e)}
+    
+    async def process_workflow_queue(self):
+        """Process Jira workflow queue - placeholder for compatibility"""
+        # This method is called by AlertingEngine but JiraIntegration doesn't use a queue
+        # All tickets are created immediately when create_ticket_from_alert is called
+        logger.debug("JiraIntegration process_workflow_queue called - no queue processing needed")
+        return True

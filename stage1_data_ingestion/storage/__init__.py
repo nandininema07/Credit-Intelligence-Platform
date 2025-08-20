@@ -1,13 +1,13 @@
 """
 Storage module for data lake operations and database management.
-Handles S3 operations, database connections, and data models.
+Handles MinIO operations, database connections, and data models.
 """
 
-from .s3_manager import S3Manager
+from .minio_manager import MinIOManager
 from .database_manager import DatabaseManager
 from .data_models import *
 
 __all__ = [
-    'S3Manager',
+    'MinIOManager',
     'DatabaseManager'
 ]

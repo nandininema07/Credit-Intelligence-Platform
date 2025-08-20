@@ -10,7 +10,7 @@ import gzip
 import logging
 import os
 from typing import List, Dict, Any, Optional, Union
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pandas as pd
 from io import StringIO, BytesIO
 import pickle
@@ -181,6 +181,34 @@ class PostgreSQLManager:
         """Store raw data in PostgreSQL"""
         if timestamp is None:
             timestamp = datetime.now()
+        
+        # Convert string timestamp to datetime if needed
+        if isinstance(timestamp, str):
+            try:
+                # Handle different timestamp formats
+                if 'T' in timestamp:
+                    # ISO format
+                    if timestamp.endswith('Z'):
+                        timestamp = timestamp.replace('Z', '+00:00')
+                    timestamp = datetime.fromisoformat(timestamp)
+                else:
+                    # Try other common formats
+                    for fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d']:
+                        try:
+                            timestamp = datetime.strptime(timestamp, fmt)
+                            break
+                        except ValueError:
+                            continue
+                    else:
+                        # If all formats fail, use current time
+                        timestamp = datetime.now()
+            except Exception as e:
+                logger.warning(f"Could not parse timestamp '{timestamp}': {e}, using current time")
+                timestamp = datetime.now()
+        
+        # Ensure timestamp is timezone-aware
+        if timestamp.tzinfo is None:
+            timestamp = timestamp.replace(tzinfo=timezone.utc)
             
         try:
             # Compress data if it's large
@@ -583,3 +611,116 @@ class PostgreSQLManager:
         if self.pool:
             await self.pool.close()
             logger.info("PostgreSQL connection pool closed")
+
+    async def get_data_by_company(self, company: str, data_type: str = None, 
+                                 start_date: datetime = None, end_date: datetime = None,
+                                 limit: int = 1000) -> List[Dict[str, Any]]:
+        """Get data for a specific company"""
+        try:
+            query = "SELECT * FROM raw_data WHERE company = $1"
+            params = [company]
+            param_count = 1
+            
+            if data_type:
+                param_count += 1
+                query += f" AND data_type = ${param_count}"
+                params.append(data_type)
+            
+            if start_date:
+                param_count += 1
+                query += f" AND timestamp >= ${param_count}"
+                params.append(start_date)
+            
+            if end_date:
+                param_count += 1
+                query += f" AND timestamp <= ${param_count}"
+                params.append(end_date)
+            
+            query += f" ORDER BY timestamp DESC LIMIT {limit}"
+            
+            async with self.pool.acquire() as conn:
+                rows = await conn.fetch(query, *params)
+                
+            return [dict(row) for row in rows]
+            
+        except Exception as e:
+            logger.error(f"Error getting data for company {company}: {e}")
+            return []
+    
+    async def bulk_insert(self, table: str, data: List[Dict[str, Any]]) -> bool:
+        """Bulk insert data into table - compatibility method for pipeline"""
+        if not data:
+            return True
+        
+        try:
+            # Convert data to raw_data format
+            raw_data_records = []
+            for record in data:
+                # Extract relevant fields
+                content = record.get('content', record)
+                metadata = {
+                    'source_type': record.get('source_type', 'unknown'),
+                    'content_type': record.get('content_type', 'unknown'),
+                    'company_ticker': record.get('company_ticker'),
+                    'language': record.get('language', 'en'),
+                    'url': record.get('url'),
+                    'published_date': record.get('published_date'),
+                    'sentiment_score': record.get('sentiment_score')
+                }
+                
+                # Convert timestamp to datetime if it's a string
+                timestamp = record.get('published_date') or datetime.now()
+                if isinstance(timestamp, str):
+                    try:
+                        # Handle different timestamp formats
+                        if 'T' in timestamp:
+                            # ISO format
+                            if timestamp.endswith('Z'):
+                                timestamp = timestamp.replace('Z', '+00:00')
+                            timestamp = datetime.fromisoformat(timestamp)
+                        else:
+                            # Try other common formats
+                            for fmt in ['%Y-%m-%d %H:%M:%S', '%Y-%m-%d %H:%M:%S.%f', '%Y-%m-%d']:
+                                try:
+                                    timestamp = datetime.strptime(timestamp, fmt)
+                                    break
+                                except ValueError:
+                                    continue
+                            else:
+                                # If all formats fail, use current time
+                                timestamp = datetime.now()
+                    except Exception as e:
+                        logger.warning(f"Could not parse timestamp '{timestamp}': {e}, using current time")
+                        timestamp = datetime.now()
+                
+                # Ensure timestamp is timezone-aware
+                if isinstance(timestamp, datetime) and timestamp.tzinfo is None:
+                    timestamp = timestamp.replace(tzinfo=timezone.utc)
+                
+                raw_data_records.append({
+                    'data_type': record.get('source_type', 'unknown'),
+                    'company': record.get('company_ticker', 'unknown'),
+                    'timestamp': timestamp,
+                    'source': record.get('source_name', 'unknown'),
+                    'language': record.get('language', 'en'),
+                    'content': content,
+                    'metadata': metadata
+                })
+            
+            # Store each record
+            for record in raw_data_records:
+                await self.store_raw_data(
+                    data=record['content'],
+                    data_type=record['data_type'],
+                    company=record['company'],
+                    source=record['source'],
+                    language=record['language'],
+                    timestamp=record['timestamp']
+                )
+            
+            logger.info(f"Bulk inserted {len(data)} records into {table}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error in bulk insert: {e}")
+            return False

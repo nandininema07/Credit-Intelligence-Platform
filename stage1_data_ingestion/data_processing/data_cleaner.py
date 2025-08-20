@@ -7,7 +7,7 @@ import asyncio
 import logging
 import re
 from typing import List, Dict, Any, Optional, Set
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import pandas as pd
 import hashlib
 from urllib.parse import urlparse
@@ -183,26 +183,39 @@ class DataCleaner:
         if not url:
             return ""
         
-        # Remove tracking parameters
-        parsed = urlparse(url)
-        if parsed.scheme and parsed.netloc:
-            # Remove common tracking parameters
-            query_params = parsed.query
-            if query_params:
-                # Remove utm_, fbclid, gclid parameters
-                clean_params = []
-                for param in query_params.split('&'):
-                    if not any(param.startswith(track) for track in ['utm_', 'fbclid', 'gclid', '_ga']):
-                        clean_params.append(param)
+        try:
+            # Parse URL
+            parsed = urlparse(url)
+            
+            # Remove tracking parameters
+            if parsed.query:
+                # Remove common tracking parameters
+                tracking_params = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'fbclid', 'gclid']
+                query_parts = parsed.query.split('&')
+                filtered_parts = []
                 
-                query_string = '&'.join(clean_params)
-                url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
-                if query_string:
-                    url += f"?{query_string}"
-            else:
-                url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
-        
-        return url
+                for part in query_parts:
+                    if not any(param in part for param in tracking_params):
+                        filtered_parts.append(part)
+                
+                if filtered_parts:
+                    clean_query = '&'.join(filtered_parts)
+                    url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}?{clean_query}"
+                else:
+                    url = f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
+            
+            return url.strip()
+            
+        except Exception as e:
+            logger.warning(f"Error cleaning URL {url}: {e}")
+            return url
+    
+    def clean_text(self, text: str, text_type: str = 'general') -> str:
+        """Clean text based on type - compatibility method for pipeline"""
+        if text_type == 'social':
+            return self._clean_social_text(text)
+        else:
+            return self._clean_text_field(text)
     
     def _clean_timestamp(self, timestamp: Any) -> Optional[datetime]:
         """Clean and validate timestamp"""
@@ -210,8 +223,12 @@ class DataCleaner:
             return None
         
         if isinstance(timestamp, datetime):
+            # Ensure timezone-aware
+            if timestamp.tzinfo is None:
+                timestamp = timestamp.replace(tzinfo=timezone.utc)
+            
             # Check if timestamp is reasonable (not too far in future/past)
-            now = datetime.now()
+            now = datetime.now(timezone.utc)
             if timestamp > now + timedelta(days=1):
                 return now  # Cap future dates
             if timestamp < now - timedelta(days=365 * 10):
@@ -222,9 +239,16 @@ class DataCleaner:
             try:
                 # Try to parse ISO format
                 if 'T' in timestamp:
-                    dt = datetime.fromisoformat(timestamp.replace('Z', '+00:00'))
+                    if timestamp.endswith('Z'):
+                        timestamp = timestamp.replace('Z', '+00:00')
+                    dt = datetime.fromisoformat(timestamp)
                 else:
                     dt = datetime.fromisoformat(timestamp)
+                
+                # Ensure timezone-aware
+                if dt.tzinfo is None:
+                    dt = dt.replace(tzinfo=timezone.utc)
+                
                 return self._clean_timestamp(dt)
             except ValueError:
                 logger.warning(f"Could not parse timestamp: {timestamp}")

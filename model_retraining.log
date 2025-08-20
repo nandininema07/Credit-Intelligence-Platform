@@ -1,0 +1,746 @@
+2025-08-21 01:53:34,189 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250820_202328
+2025-08-21 01:53:34,245 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250820_202335
+2025-08-21 01:53:34,261 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250820_202303
+2025-08-21 01:53:34,262 - stage3_model_training.main_trainer - INFO - Stage 3 Model Training initialized successfully
+2025-08-21 01:56:19,812 - __main__ - INFO - Starting model retraining with improved feature engineering...
+2025-08-21 01:56:19,828 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250820_202328
+2025-08-21 01:56:19,861 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250820_202335
+2025-08-21 01:56:19,875 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250820_202303
+2025-08-21 01:56:19,877 - stage3_model_training.main_trainer - INFO - Stage 3 Model Training initialized successfully
+2025-08-21 01:56:19,878 - __main__ - INFO - Models are up to date, but retraining anyway for improved features...
+2025-08-21 01:56:19,880 - __main__ - INFO - Retraining XGBoost model...
+2025-08-21 01:56:19,880 - __main__ - ERROR - Error during model retraining: ModelTrainer.train_models() takes 1 positional argument but 2 were given
+2025-08-21 01:57:48,864 - __main__ - INFO - Starting model retraining with improved feature engineering...
+2025-08-21 01:57:48,891 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250820_202328
+2025-08-21 01:57:48,926 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250820_202335
+2025-08-21 01:57:48,941 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250820_202303
+2025-08-21 01:57:48,942 - stage3_model_training.main_trainer - INFO - Stage 3 Model Training initialized successfully
+2025-08-21 01:57:48,945 - __main__ - INFO - Models are up to date, but retraining anyway for improved features...
+2025-08-21 01:57:48,946 - __main__ - INFO - Retraining all models...
+2025-08-21 01:57:48,946 - stage3_model_training.main_trainer - INFO - Starting model training...
+2025-08-21 01:57:48,950 - stage3_model_training.main_trainer - INFO - Preparing training data...
+2025-08-21 01:57:48,951 - stage3_model_training.main_trainer - INFO - Generating synthetic training data with meaningful features...
+2025-08-21 01:57:48,975 - stage3_model_training.main_trainer - INFO - Prepared training data: 1000 samples, 35 features
+2025-08-21 01:57:48,984 - stage3_model_training.main_trainer - INFO - Training xgboost model...
+2025-08-21 01:57:56,023 - stage3_model_training.main_trainer - ERROR - Error tuning hyperparameters for xgboost: 
+All the 81 fits failed.
+It is very likely that your model is misconfigured.
+You can try to debug the error by setting error_score='raise'.
+
+Below are more details about the failures:
+--------------------------------------------------------------------------------
+80 fits failed with the following error:
+Traceback (most recent call last):
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\sklearn\model_selection\_validation.py", line 859, in _fit_and_score
+    estimator.fit(X_train, y_train, **fit_params)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\sklearn.py", line 1683, in fit
+    self._Booster = train(
+                    ~~~~~^
+        params,
+        ^^^^^^^
+    ...<9 lines>...
+        callbacks=self.callbacks,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\training.py", line 183, in train
+    bst.update(dtrain, iteration=i, fobj=obj)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 2246, in update
+    _check_call(
+    ~~~~~~~~~~~^
+        _LIB.XGBoosterUpdateOneIter(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            self.handle, ctypes.c_int(iteration), dtrain.handle
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 310, in _check_call
+    raise XGBoostError(py_str(_LIB.XGBGetLastError()))
+xgboost.core.XGBoostError: [01:57:55] C:\actions-runner\_work\xgboost\xgboost\src\objective\./regression_loss.h:68: Check failed: base_score > 0.0f && base_score < 1.0f: base_score must be in (0,1) for logistic loss, got: 0
+
+--------------------------------------------------------------------------------
+1 fits failed with the following error:
+Traceback (most recent call last):
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\sklearn\model_selection\_validation.py", line 859, in _fit_and_score
+    estimator.fit(X_train, y_train, **fit_params)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\sklearn.py", line 1683, in fit
+    self._Booster = train(
+                    ~~~~~^
+        params,
+        ^^^^^^^
+    ...<9 lines>...
+        callbacks=self.callbacks,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\training.py", line 183, in train
+    bst.update(dtrain, iteration=i, fobj=obj)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 2246, in update
+    _check_call(
+    ~~~~~~~~~~~^
+        _LIB.XGBoosterUpdateOneIter(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            self.handle, ctypes.c_int(iteration), dtrain.handle
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 310, in _check_call
+    raise XGBoostError(py_str(_LIB.XGBGetLastError()))
+xgboost.core.XGBoostError: [01:57:56] C:\actions-runner\_work\xgboost\xgboost\src\objective\./regression_loss.h:68: Check failed: base_score > 0.0f && base_score < 1.0f: base_score must be in (0,1) for logistic loss, got: 0
+
+2025-08-21 01:57:56,063 - stage3_model_training.main_trainer - ERROR - Error training xgboost model: [01:57:56] C:\actions-runner\_work\xgboost\xgboost\src\objective\./regression_loss.h:68: Check failed: base_score > 0.0f && base_score < 1.0f: base_score must be in (0,1) for logistic loss, got: 0
+2025-08-21 01:57:56,064 - stage3_model_training.main_trainer - INFO - Training lightgbm model...
+2025-08-21 01:58:03,994 - stage3_model_training.main_trainer - INFO - Best parameters for lightgbm: {'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 50}
+2025-08-21 01:58:04,049 - stage3_model_training.main_trainer - INFO - Saved model: lightgbm_v20250821_015804 (Production ready: True)
+2025-08-21 01:58:04,054 - stage3_model_training.main_trainer - INFO - Successfully trained lightgbm: F1=1.000
+2025-08-21 01:58:04,057 - stage3_model_training.main_trainer - INFO - Training random_forest model...
+2025-08-21 01:58:07,154 - stage3_model_training.main_trainer - INFO - Best parameters for random_forest: {'max_depth': 5, 'min_samples_split': 2, 'n_estimators': 50}
+2025-08-21 01:58:07,274 - stage3_model_training.main_trainer - INFO - Saved model: random_forest_v20250821_015807 (Production ready: True)
+2025-08-21 01:58:07,275 - stage3_model_training.main_trainer - INFO - Successfully trained random_forest: F1=1.000
+2025-08-21 01:58:07,276 - stage3_model_training.main_trainer - INFO - Selected best model: lightgbm_v20250821_015804 (F1: 1.000)
+2025-08-21 01:58:07,276 - stage3_model_training.main_trainer - INFO - Model training completed
+2025-08-21 01:58:07,277 - __main__ - INFO - 
+============================================================
+2025-08-21 01:58:07,277 - __main__ - INFO - MODEL RETRAINING RESULTS
+2025-08-21 01:58:07,277 - __main__ - INFO - ============================================================
+2025-08-21 01:58:07,277 - __main__ - ERROR - 
+XGBOOST: Failed to train - Training failed
+2025-08-21 01:58:07,278 - __main__ - INFO - 
+LIGHTGBM:
+2025-08-21 01:58:07,278 - __main__ - INFO -   Success: True
+2025-08-21 01:58:07,278 - __main__ - INFO -   Model Name: lightgbm_v20250821_015804
+2025-08-21 01:58:07,278 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 01:58:07,278 - __main__ - INFO -   Precision: 1.000
+2025-08-21 01:58:07,279 - __main__ - INFO -   Recall: 1.000
+2025-08-21 01:58:07,279 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 01:58:07,279 - __main__ - INFO -   Production Ready: True
+2025-08-21 01:58:07,279 - __main__ - INFO - 
+RANDOM_FOREST:
+2025-08-21 01:58:07,279 - __main__ - INFO -   Success: True
+2025-08-21 01:58:07,280 - __main__ - INFO -   Model Name: random_forest_v20250821_015807
+2025-08-21 01:58:07,280 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 01:58:07,280 - __main__ - INFO -   Precision: 1.000
+2025-08-21 01:58:07,280 - __main__ - INFO -   Recall: 1.000
+2025-08-21 01:58:07,280 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 01:58:07,281 - __main__ - INFO -   Production Ready: True
+2025-08-21 01:58:07,281 - __main__ - INFO - 
+============================================================
+2025-08-21 01:58:07,281 - __main__ - INFO - PRODUCTION STATUS
+2025-08-21 01:58:07,281 - __main__ - INFO - ============================================================
+2025-08-21 01:58:07,281 - __main__ - INFO - Production Ready Models (2):
+2025-08-21 01:58:07,282 - __main__ - INFO -   - lightgbm_v20250821_015804
+2025-08-21 01:58:07,282 - __main__ - INFO -   - random_forest_v20250821_015807
+2025-08-21 01:58:07,282 - __main__ - INFO - 
+============================================================
+2025-08-21 01:58:07,282 - __main__ - INFO - RECOMMENDATIONS
+2025-08-21 01:58:07,283 - __main__ - INFO - ============================================================
+2025-08-21 01:58:07,283 - __main__ - INFO - Models are ready for production use
+2025-08-21 01:58:07,283 - __main__ - INFO -    - Monitor performance in production
+2025-08-21 01:58:07,283 - __main__ - INFO -    - Set up automated retraining
+2025-08-21 01:58:07,283 - __main__ - INFO -    - Implement A/B testing
+2025-08-21 01:58:07,284 - __main__ - INFO - 
+Model retraining completed!
+2025-08-21 01:59:34,754 - __main__ - INFO - Starting model retraining with improved feature engineering...
+2025-08-21 01:59:34,767 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250820_202328
+2025-08-21 01:59:34,770 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015804
+2025-08-21 01:59:34,800 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250820_202335
+2025-08-21 01:59:34,826 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015807
+2025-08-21 01:59:34,843 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250820_202303
+2025-08-21 01:59:34,847 - stage3_model_training.main_trainer - INFO - Stage 3 Model Training initialized successfully
+2025-08-21 01:59:34,848 - stage3_model_training.main_trainer - INFO - Model lightgbm_v20250821_015804 performance degraded, retraining needed
+2025-08-21 01:59:34,848 - __main__ - INFO - Retraining is needed, proceeding...
+2025-08-21 01:59:34,849 - __main__ - INFO - Retraining all models...
+2025-08-21 01:59:34,849 - stage3_model_training.main_trainer - INFO - Starting model training...
+2025-08-21 01:59:34,849 - stage3_model_training.main_trainer - INFO - Preparing training data...
+2025-08-21 01:59:34,850 - stage3_model_training.main_trainer - INFO - Generating synthetic training data with meaningful features...
+2025-08-21 01:59:34,857 - stage3_model_training.main_trainer - INFO - Prepared training data: 1000 samples, 35 features
+2025-08-21 01:59:34,862 - stage3_model_training.main_trainer - INFO - Training xgboost model...
+2025-08-21 01:59:43,381 - stage3_model_training.main_trainer - ERROR - Error tuning hyperparameters for xgboost: 
+All the 81 fits failed.
+It is very likely that your model is misconfigured.
+You can try to debug the error by setting error_score='raise'.
+
+Below are more details about the failures:
+--------------------------------------------------------------------------------
+81 fits failed with the following error:
+Traceback (most recent call last):
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\sklearn\model_selection\_validation.py", line 859, in _fit_and_score
+    estimator.fit(X_train, y_train, **fit_params)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\sklearn.py", line 1683, in fit
+    self._Booster = train(
+                    ~~~~~^
+        params,
+        ^^^^^^^
+    ...<9 lines>...
+        callbacks=self.callbacks,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\training.py", line 183, in train
+    bst.update(dtrain, iteration=i, fobj=obj)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 2246, in update
+    _check_call(
+    ~~~~~~~~~~~^
+        _LIB.XGBoosterUpdateOneIter(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+            self.handle, ctypes.c_int(iteration), dtrain.handle
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+        )
+        ^
+    )
+    ^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 310, in _check_call
+    raise XGBoostError(py_str(_LIB.XGBGetLastError()))
+xgboost.core.XGBoostError: value 0 for Parameter num_class should be greater equal to 1
+num_class: Number of output class in the multi-class classification.
+
+2025-08-21 01:59:43,410 - stage3_model_training.main_trainer - ERROR - Error training xgboost model: value 0 for Parameter num_class should be greater equal to 1
+num_class: Number of output class in the multi-class classification.
+2025-08-21 01:59:43,411 - stage3_model_training.main_trainer - INFO - Training lightgbm model...
+2025-08-21 01:59:49,047 - stage3_model_training.main_trainer - INFO - Best parameters for lightgbm: {'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 50}
+2025-08-21 01:59:49,103 - stage3_model_training.main_trainer - INFO - Saved model: lightgbm_v20250821_015949 (Production ready: True)
+2025-08-21 01:59:49,103 - stage3_model_training.main_trainer - INFO - Successfully trained lightgbm: F1=1.000
+2025-08-21 01:59:49,104 - stage3_model_training.main_trainer - INFO - Training random_forest model...
+2025-08-21 01:59:52,256 - stage3_model_training.main_trainer - INFO - Best parameters for random_forest: {'max_depth': 5, 'min_samples_split': 2, 'n_estimators': 50}
+2025-08-21 01:59:52,378 - stage3_model_training.main_trainer - INFO - Saved model: random_forest_v20250821_015952 (Production ready: True)
+2025-08-21 01:59:52,379 - stage3_model_training.main_trainer - INFO - Successfully trained random_forest: F1=1.000
+2025-08-21 01:59:52,379 - stage3_model_training.main_trainer - INFO - Selected best model: lightgbm_v20250821_015949 (F1: 1.000)
+2025-08-21 01:59:52,380 - stage3_model_training.main_trainer - INFO - Model training completed
+2025-08-21 01:59:52,380 - __main__ - INFO - 
+============================================================
+2025-08-21 01:59:52,381 - __main__ - INFO - MODEL RETRAINING RESULTS
+2025-08-21 01:59:52,381 - __main__ - INFO - ============================================================
+2025-08-21 01:59:52,381 - __main__ - ERROR - 
+XGBOOST: Failed to train - Training failed
+2025-08-21 01:59:52,382 - __main__ - INFO - 
+LIGHTGBM:
+2025-08-21 01:59:52,382 - __main__ - INFO -   Success: True
+2025-08-21 01:59:52,382 - __main__ - INFO -   Model Name: lightgbm_v20250821_015949
+2025-08-21 01:59:52,382 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 01:59:52,383 - __main__ - INFO -   Precision: 1.000
+2025-08-21 01:59:52,383 - __main__ - INFO -   Recall: 1.000
+2025-08-21 01:59:52,383 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 01:59:52,383 - __main__ - INFO -   Production Ready: True
+2025-08-21 01:59:52,383 - __main__ - INFO - 
+RANDOM_FOREST:
+2025-08-21 01:59:52,383 - __main__ - INFO -   Success: True
+2025-08-21 01:59:52,384 - __main__ - INFO -   Model Name: random_forest_v20250821_015952
+2025-08-21 01:59:52,384 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 01:59:52,384 - __main__ - INFO -   Precision: 1.000
+2025-08-21 01:59:52,384 - __main__ - INFO -   Recall: 1.000
+2025-08-21 01:59:52,385 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 01:59:52,385 - __main__ - INFO -   Production Ready: True
+2025-08-21 01:59:52,385 - __main__ - INFO - 
+============================================================
+2025-08-21 01:59:52,386 - __main__ - INFO - PRODUCTION STATUS
+2025-08-21 01:59:52,386 - __main__ - INFO - ============================================================
+2025-08-21 01:59:52,386 - __main__ - INFO - Production Ready Models (4):
+2025-08-21 01:59:52,387 - __main__ - INFO -   - lightgbm_v20250821_015804
+2025-08-21 01:59:52,387 - __main__ - INFO -   - random_forest_v20250821_015807
+2025-08-21 01:59:52,387 - __main__ - INFO -   - lightgbm_v20250821_015949
+2025-08-21 01:59:52,387 - __main__ - INFO -   - random_forest_v20250821_015952
+2025-08-21 01:59:52,388 - __main__ - INFO - 
+============================================================
+2025-08-21 01:59:52,388 - __main__ - INFO - RECOMMENDATIONS
+2025-08-21 01:59:52,389 - __main__ - INFO - ============================================================
+2025-08-21 01:59:52,389 - __main__ - INFO - Models are ready for production use
+2025-08-21 01:59:52,390 - __main__ - INFO -    - Monitor performance in production
+2025-08-21 01:59:52,390 - __main__ - INFO -    - Set up automated retraining
+2025-08-21 01:59:52,391 - __main__ - INFO -    - Implement A/B testing
+2025-08-21 01:59:52,391 - __main__ - INFO - 
+Model retraining completed!
+2025-08-21 02:03:51,048 - __main__ - INFO - Starting model retraining with improved feature engineering...
+2025-08-21 02:03:51,083 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250820_202328
+2025-08-21 02:03:51,087 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015804
+2025-08-21 02:03:51,097 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015949
+2025-08-21 02:03:51,182 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250820_202335
+2025-08-21 02:03:51,214 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015807
+2025-08-21 02:03:51,234 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015952
+2025-08-21 02:03:51,255 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250820_202303
+2025-08-21 02:03:51,256 - stage3_model_training.main_trainer - INFO - Stage 3 Model Training initialized successfully
+2025-08-21 02:03:51,256 - stage3_model_training.main_trainer - INFO - Model lightgbm_v20250821_015804 performance degraded, retraining needed
+2025-08-21 02:03:51,257 - __main__ - INFO - Retraining is needed, proceeding...
+2025-08-21 02:03:51,257 - __main__ - INFO - Retraining all models...
+2025-08-21 02:03:51,257 - stage3_model_training.main_trainer - INFO - Starting model training...
+2025-08-21 02:03:51,260 - stage3_model_training.main_trainer - INFO - Preparing training data...
+2025-08-21 02:03:51,261 - stage3_model_training.main_trainer - INFO - Generating synthetic training data with meaningful features...
+2025-08-21 02:03:51,442 - stage3_model_training.main_trainer - INFO - Prepared training data: 1000 samples, 35 features
+2025-08-21 02:03:51,447 - stage3_model_training.main_trainer - INFO - Training xgboost model...
+2025-08-21 02:04:27,405 - stage3_model_training.main_trainer - INFO - Best parameters for xgboost: {'learning_rate': 0.01, 'max_depth': 9, 'n_estimators': 50}
+2025-08-21 02:04:29,192 - stage3_model_training.main_trainer - WARNING - Model xgboost_v20250821_020429 does not meet production thresholds:
+2025-08-21 02:04:29,192 - stage3_model_training.main_trainer - WARNING -   - accuracy: 0.640 < 0.7 (threshold)
+2025-08-21 02:04:29,193 - stage3_model_training.main_trainer - WARNING -   - precision: 0.405 < 0.65 (threshold)
+2025-08-21 02:04:29,193 - stage3_model_training.main_trainer - WARNING -   - recall: 0.389 < 0.6 (threshold)
+2025-08-21 02:04:29,194 - stage3_model_training.main_trainer - WARNING -   - f1_score: 0.372 < 0.62 (threshold)
+2025-08-21 02:04:29,194 - stage3_model_training.main_trainer - WARNING -   - F1-score too low for production use
+2025-08-21 02:04:29,194 - stage3_model_training.main_trainer - INFO - Renamed model to xgboost_v20250821_020429_fallback to indicate fallback status
+2025-08-21 02:04:29,212 - stage3_model_training.main_trainer - INFO - Saved model: xgboost_v20250821_020429_fallback (Production ready: False)
+2025-08-21 02:04:29,213 - stage3_model_training.main_trainer - INFO - Successfully trained xgboost: F1=0.372
+2025-08-21 02:04:29,213 - stage3_model_training.main_trainer - INFO - Training lightgbm model...
+2025-08-21 02:05:25,072 - stage3_model_training.main_trainer - INFO - Best parameters for lightgbm: {'learning_rate': 0.1, 'max_depth': 3, 'n_estimators': 200}
+2025-08-21 02:05:27,040 - stage3_model_training.main_trainer - WARNING - Model lightgbm_v20250821_020527 does not meet production thresholds:
+2025-08-21 02:05:27,040 - stage3_model_training.main_trainer - WARNING -   - accuracy: 0.580 < 0.7 (threshold)
+2025-08-21 02:05:27,040 - stage3_model_training.main_trainer - WARNING -   - precision: 0.333 < 0.65 (threshold)
+2025-08-21 02:05:27,041 - stage3_model_training.main_trainer - WARNING -   - recall: 0.350 < 0.6 (threshold)
+2025-08-21 02:05:27,041 - stage3_model_training.main_trainer - WARNING -   - f1_score: 0.331 < 0.62 (threshold)
+2025-08-21 02:05:27,041 - stage3_model_training.main_trainer - WARNING -   - F1-score too low for production use
+2025-08-21 02:05:27,042 - stage3_model_training.main_trainer - WARNING -   - Accuracy too low for production use
+2025-08-21 02:05:27,042 - stage3_model_training.main_trainer - INFO - Renamed model to lightgbm_v20250821_020527_fallback to indicate fallback status
+2025-08-21 02:05:27,090 - stage3_model_training.main_trainer - INFO - Saved model: lightgbm_v20250821_020527_fallback (Production ready: False)
+2025-08-21 02:05:27,093 - stage3_model_training.main_trainer - INFO - Successfully trained lightgbm: F1=0.331
+2025-08-21 02:05:27,094 - stage3_model_training.main_trainer - INFO - Training random_forest model...
+2025-08-21 02:05:46,174 - stage3_model_training.main_trainer - INFO - Best parameters for random_forest: {'max_depth': 15, 'min_samples_split': 5, 'n_estimators': 50}
+2025-08-21 02:05:48,407 - stage3_model_training.main_trainer - WARNING - Model random_forest_v20250821_020548 does not meet production thresholds:
+2025-08-21 02:05:48,408 - stage3_model_training.main_trainer - WARNING -   - accuracy: 0.630 < 0.7 (threshold)
+2025-08-21 02:05:48,408 - stage3_model_training.main_trainer - WARNING -   - precision: 0.401 < 0.65 (threshold)
+2025-08-21 02:05:48,409 - stage3_model_training.main_trainer - WARNING -   - recall: 0.351 < 0.6 (threshold)
+2025-08-21 02:05:48,409 - stage3_model_training.main_trainer - WARNING -   - f1_score: 0.297 < 0.62 (threshold)
+2025-08-21 02:05:48,410 - stage3_model_training.main_trainer - WARNING -   - F1-score too low for production use
+2025-08-21 02:05:48,410 - stage3_model_training.main_trainer - INFO - Renamed model to random_forest_v20250821_020548_fallback to indicate fallback status
+2025-08-21 02:05:48,490 - stage3_model_training.main_trainer - INFO - Saved model: random_forest_v20250821_020548_fallback (Production ready: False)
+2025-08-21 02:05:48,491 - stage3_model_training.main_trainer - INFO - Successfully trained random_forest: F1=0.297
+2025-08-21 02:05:48,492 - stage3_model_training.main_trainer - INFO - Selected best model: xgboost_v20250821_020429 (F1: 0.372)
+2025-08-21 02:05:48,493 - stage3_model_training.main_trainer - INFO - Model training completed
+2025-08-21 02:05:48,494 - __main__ - INFO - 
+============================================================
+2025-08-21 02:05:48,494 - __main__ - INFO - MODEL RETRAINING RESULTS
+2025-08-21 02:05:48,495 - __main__ - INFO - ============================================================
+2025-08-21 02:05:48,496 - __main__ - INFO - 
+XGBOOST:
+2025-08-21 02:05:48,498 - __main__ - INFO -   Success: True
+2025-08-21 02:05:48,499 - __main__ - INFO -   Model Name: xgboost_v20250821_020429
+2025-08-21 02:05:48,500 - __main__ - INFO -   Accuracy: 0.640
+2025-08-21 02:05:48,501 - __main__ - INFO -   Precision: 0.405
+2025-08-21 02:05:48,502 - __main__ - INFO -   Recall: 0.389
+2025-08-21 02:05:48,502 - __main__ - INFO -   F1-Score: 0.372
+2025-08-21 02:05:48,503 - __main__ - INFO -   CV F1-Score: 0.341 ± 0.068
+2025-08-21 02:05:48,503 - __main__ - INFO -   Production Ready: False
+2025-08-21 02:05:48,504 - __main__ - WARNING -   Warnings: ['accuracy: 0.640 < 0.7 (threshold)', 'precision: 0.405 < 0.65 (threshold)', 'recall: 0.389 < 0.6 (threshold)', 'f1_score: 0.372 < 0.62 (threshold)', 'F1-score too low for production use']
+2025-08-21 02:05:48,504 - __main__ - INFO - 
+LIGHTGBM:
+2025-08-21 02:05:48,505 - __main__ - INFO -   Success: True
+2025-08-21 02:05:48,505 - __main__ - INFO -   Model Name: lightgbm_v20250821_020527
+2025-08-21 02:05:48,506 - __main__ - INFO -   Accuracy: 0.580
+2025-08-21 02:05:48,506 - __main__ - INFO -   Precision: 0.333
+2025-08-21 02:05:48,507 - __main__ - INFO -   Recall: 0.350
+2025-08-21 02:05:48,507 - __main__ - INFO -   F1-Score: 0.331
+2025-08-21 02:05:48,508 - __main__ - INFO -   CV F1-Score: 0.313 ± 0.047
+2025-08-21 02:05:48,512 - __main__ - INFO -   Production Ready: False
+2025-08-21 02:05:48,516 - __main__ - WARNING -   Warnings: ['accuracy: 0.580 < 0.7 (threshold)', 'precision: 0.333 < 0.65 (threshold)', 'recall: 0.350 < 0.6 (threshold)', 'f1_score: 0.331 < 0.62 (threshold)', 'F1-score too low for production use', 'Accuracy too low for production use']
+2025-08-21 02:05:48,517 - __main__ - INFO - 
+RANDOM_FOREST:
+2025-08-21 02:05:48,517 - __main__ - INFO -   Success: True
+2025-08-21 02:05:48,518 - __main__ - INFO -   Model Name: random_forest_v20250821_020548
+2025-08-21 02:05:48,518 - __main__ - INFO -   Accuracy: 0.630
+2025-08-21 02:05:48,519 - __main__ - INFO -   Precision: 0.401
+2025-08-21 02:05:48,520 - __main__ - INFO -   Recall: 0.351
+2025-08-21 02:05:48,520 - __main__ - INFO -   F1-Score: 0.297
+2025-08-21 02:05:48,521 - __main__ - INFO -   CV F1-Score: 0.313 ± 0.054
+2025-08-21 02:05:48,522 - __main__ - INFO -   Production Ready: False
+2025-08-21 02:05:48,522 - __main__ - WARNING -   Warnings: ['accuracy: 0.630 < 0.7 (threshold)', 'precision: 0.401 < 0.65 (threshold)', 'recall: 0.351 < 0.6 (threshold)', 'f1_score: 0.297 < 0.62 (threshold)', 'F1-score too low for production use']
+2025-08-21 02:05:48,523 - __main__ - INFO - 
+============================================================
+2025-08-21 02:05:48,524 - __main__ - INFO - PRODUCTION STATUS
+2025-08-21 02:05:48,524 - __main__ - INFO - ============================================================
+2025-08-21 02:05:48,524 - __main__ - INFO - Production Ready Models (4):
+2025-08-21 02:05:48,525 - __main__ - INFO -   - lightgbm_v20250821_015804
+2025-08-21 02:05:48,525 - __main__ - INFO -   - lightgbm_v20250821_015949
+2025-08-21 02:05:48,526 - __main__ - INFO -   - random_forest_v20250821_015807
+2025-08-21 02:05:48,526 - __main__ - INFO -   - random_forest_v20250821_015952
+2025-08-21 02:05:48,527 - __main__ - INFO - Fallback Models (3):
+2025-08-21 02:05:48,527 - __main__ - INFO -   - xgboost_v20250821_020429_fallback
+2025-08-21 02:05:48,529 - __main__ - INFO -   - lightgbm_v20250821_020527_fallback
+2025-08-21 02:05:48,530 - __main__ - INFO -   - random_forest_v20250821_020548_fallback
+2025-08-21 02:05:48,532 - __main__ - INFO - 
+============================================================
+2025-08-21 02:05:48,534 - __main__ - INFO - RECOMMENDATIONS
+2025-08-21 02:05:48,536 - __main__ - INFO - ============================================================
+2025-08-21 02:05:48,538 - __main__ - INFO - Models are ready for production use
+2025-08-21 02:05:48,541 - __main__ - INFO -    - Monitor performance in production
+2025-08-21 02:05:48,541 - __main__ - INFO -    - Set up automated retraining
+2025-08-21 02:05:48,542 - __main__ - INFO -    - Implement A/B testing
+2025-08-21 02:05:48,543 - __main__ - INFO - 
+Model retraining completed!
+2025-08-21 02:12:41,943 - __main__ - INFO - Starting model retraining with improved feature engineering...
+2025-08-21 02:12:41,972 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250820_202328
+2025-08-21 02:12:41,977 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015804
+2025-08-21 02:12:41,981 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015949
+2025-08-21 02:12:42,001 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_020527_fallback
+2025-08-21 02:12:42,063 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250820_202335
+2025-08-21 02:12:42,089 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015807
+2025-08-21 02:12:42,105 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015952
+2025-08-21 02:12:42,122 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_020548_fallback
+2025-08-21 02:12:42,139 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250820_202303
+2025-08-21 02:12:42,160 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250821_020429_fallback
+2025-08-21 02:12:42,161 - stage3_model_training.main_trainer - INFO - Stage 3 Model Training initialized successfully
+2025-08-21 02:12:42,162 - stage3_model_training.main_trainer - INFO - Model lightgbm_v20250821_015804 performance degraded, retraining needed
+2025-08-21 02:12:42,162 - __main__ - INFO - Retraining is needed, proceeding...
+2025-08-21 02:12:42,163 - __main__ - INFO - Retraining all models...
+2025-08-21 02:12:42,164 - stage3_model_training.main_trainer - INFO - Starting model training...
+2025-08-21 02:12:42,164 - stage3_model_training.main_trainer - INFO - Preparing training data from real financial sources...
+2025-08-21 02:13:15,802 - tensorflow - WARNING - From C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-08-21 02:13:16,562 - stage2_feature_engineering.real_data_integration - INFO - Initializing real financial data integration...
+2025-08-21 02:13:16,563 - stage2_feature_engineering.real_data_integration - WARNING - Alpha Vantage API key not provided - some features will be limited
+2025-08-21 02:13:16,564 - stage2_feature_engineering.real_data_integration - WARNING - News API key not provided - sentiment features will be limited
+2025-08-21 02:13:16,564 - stage2_feature_engineering.real_data_integration - INFO - Real data integration initialized successfully
+2025-08-21 02:13:16,564 - stage2_feature_engineering.real_data_integration - INFO - Building training dataset for 10 companies...
+2025-08-21 02:13:16,565 - stage2_feature_engineering.real_data_integration - INFO - Fetching financial data for 10 companies...
+2025-08-21 02:13:16,565 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for AAPL
+2025-08-21 02:13:16,567 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for MSFT
+2025-08-21 02:13:16,568 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for GOOGL
+2025-08-21 02:13:16,569 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for AMZN
+2025-08-21 02:13:16,570 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for TSLA
+2025-08-21 02:13:16,570 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for META
+2025-08-21 02:13:16,571 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for NVDA
+2025-08-21 02:13:16,571 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for NFLX
+2025-08-21 02:13:16,572 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for ADBE
+2025-08-21 02:13:16,573 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for CRM
+2025-08-21 02:13:16,575 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for 10 companies
+2025-08-21 02:13:16,576 - stage2_feature_engineering.real_data_integration - INFO - Fetching news sentiment data for 10 companies...
+2025-08-21 02:13:16,576 - stage2_feature_engineering.real_data_integration - WARNING - News API key not provided - using mock sentiment data
+2025-08-21 02:13:16,592 - stage2_feature_engineering.real_data_integration - INFO - Generating realistic credit outcomes...
+2025-08-21 02:13:16,599 - stage2_feature_engineering.real_data_integration - INFO - Generated credit outcomes: [9 0 1]
+2025-08-21 02:13:16,647 - stage2_feature_engineering.real_data_integration - INFO - Prepared 23 features
+2025-08-21 02:13:16,647 - stage2_feature_engineering.real_data_integration - INFO - Training dataset ready: 10 samples, 23 features
+2025-08-21 02:13:16,648 - stage3_model_training.main_trainer - INFO - Successfully loaded real financial data: 10 samples, 23 features
+2025-08-21 02:13:16,650 - stage3_model_training.main_trainer - ERROR - Error in model training: The least populated class in y has only 1 member, which is too few. The minimum number of groups for any class cannot be less than 2.
+2025-08-21 02:13:16,650 - __main__ - INFO - 
+============================================================
+2025-08-21 02:13:16,650 - __main__ - INFO - MODEL RETRAINING RESULTS
+2025-08-21 02:13:16,650 - __main__ - INFO - ============================================================
+2025-08-21 02:13:16,651 - __main__ - ERROR - Error during model retraining: 'bool' object has no attribute 'get'
+2025-08-21 02:14:50,913 - __main__ - INFO - Starting model retraining with improved feature engineering...
+2025-08-21 02:14:50,929 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250820_202328
+2025-08-21 02:14:50,932 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015804
+2025-08-21 02:14:50,937 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015949
+2025-08-21 02:14:50,950 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_020527_fallback
+2025-08-21 02:14:51,012 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250820_202335
+2025-08-21 02:14:51,031 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015807
+2025-08-21 02:14:51,055 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015952
+2025-08-21 02:14:51,077 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_020548_fallback
+2025-08-21 02:14:51,092 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250820_202303
+2025-08-21 02:14:51,113 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250821_020429_fallback
+2025-08-21 02:14:51,115 - stage3_model_training.main_trainer - INFO - Stage 3 Model Training initialized successfully
+2025-08-21 02:14:51,116 - stage3_model_training.main_trainer - INFO - Model lightgbm_v20250821_015804 performance degraded, retraining needed
+2025-08-21 02:14:51,117 - __main__ - INFO - Retraining is needed, proceeding...
+2025-08-21 02:14:51,121 - __main__ - INFO - Retraining all models...
+2025-08-21 02:14:51,123 - stage3_model_training.main_trainer - INFO - Starting model training...
+2025-08-21 02:14:51,125 - stage3_model_training.main_trainer - INFO - Preparing training data from real financial sources...
+2025-08-21 02:15:22,250 - tensorflow - WARNING - From C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-08-21 02:15:22,707 - stage2_feature_engineering.real_data_integration - INFO - Initializing real financial data integration...
+2025-08-21 02:15:22,707 - stage2_feature_engineering.real_data_integration - INFO - Real data integration initialized successfully
+2025-08-21 02:15:22,708 - stage2_feature_engineering.real_data_integration - INFO - Building training dataset for 10 companies...
+2025-08-21 02:15:22,708 - stage2_feature_engineering.real_data_integration - INFO - Fetching financial data for 10 companies...
+2025-08-21 02:15:23,609 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for AAPL
+2025-08-21 02:15:24,532 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for MSFT
+2025-08-21 02:15:25,402 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for GOOGL
+2025-08-21 02:15:26,231 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for AMZN
+2025-08-21 02:15:27,050 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for TSLA
+2025-08-21 02:15:27,869 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for META
+2025-08-21 02:15:28,690 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for NVDA
+2025-08-21 02:15:29,508 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for NFLX
+2025-08-21 02:15:30,327 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for ADBE
+2025-08-21 02:15:31,246 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for CRM
+2025-08-21 02:15:31,248 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for 10 companies
+2025-08-21 02:15:31,248 - stage2_feature_engineering.real_data_integration - INFO - Fetching news sentiment data for 10 companies...
+2025-08-21 02:15:32,783 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:34,275 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:35,810 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:37,314 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:38,860 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:40,430 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:42,000 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:42,825 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:44,457 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:46,104 - stage2_feature_engineering.real_data_integration - WARNING - News API error: You have made too many requests recently. Developer accounts are limited to 100 requests over a 24 hour period (50 requests available every 12 hours). Please upgrade to a paid plan if you need more requests.
+2025-08-21 02:15:46,107 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched sentiment data for 10 companies
+2025-08-21 02:15:46,111 - stage2_feature_engineering.real_data_integration - INFO - Generating realistic credit outcomes...
+2025-08-21 02:15:46,113 - stage2_feature_engineering.real_data_integration - INFO - Generated credit outcomes: [ 0  0 10]
+2025-08-21 02:15:46,136 - stage2_feature_engineering.real_data_integration - INFO - Prepared 23 features
+2025-08-21 02:15:46,138 - stage2_feature_engineering.real_data_integration - INFO - Training dataset ready: 10 samples, 23 features
+2025-08-21 02:15:46,139 - stage3_model_training.main_trainer - INFO - Successfully loaded real financial data: 10 samples, 23 features
+2025-08-21 02:15:46,144 - stage3_model_training.main_trainer - INFO - Training xgboost model...
+2025-08-21 02:16:11,231 - stage3_model_training.main_trainer - ERROR - Error tuning hyperparameters for xgboost: 
+All the 81 fits failed.
+It is very likely that your model is misconfigured.
+You can try to debug the error by setting error_score='raise'.
+
+Below are more details about the failures:
+--------------------------------------------------------------------------------
+81 fits failed with the following error:
+Traceback (most recent call last):
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\sklearn\model_selection\_validation.py", line 859, in _fit_and_score
+    estimator.fit(X_train, y_train, **fit_params)
+    ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\core.py", line 729, in inner_f
+    return func(**kwargs)
+  File "C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\xgboost\sklearn.py", line 1641, in fit
+    raise ValueError(
+    ...<2 lines>...
+    )
+ValueError: Invalid classes inferred from unique values of `y`.  Expected: [0], got [2]
+
+2025-08-21 02:16:11,234 - stage3_model_training.main_trainer - ERROR - Error training xgboost model: Invalid classes inferred from unique values of `y`.  Expected: [0], got [2]
+2025-08-21 02:16:11,235 - stage3_model_training.main_trainer - INFO - Training lightgbm model...
+2025-08-21 02:16:18,803 - stage3_model_training.main_trainer - INFO - Best parameters for lightgbm: {'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 50}
+2025-08-21 02:16:18,883 - stage3_model_training.main_trainer - WARNING - Model lightgbm_v20250821_021618 does not meet production thresholds:
+2025-08-21 02:16:18,883 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:16:18,884 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:16:18,884 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:16:18,884 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:16:18,884 - stage3_model_training.main_trainer - WARNING -   - CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!
+2025-08-21 02:16:18,885 - stage3_model_training.main_trainer - INFO - Renamed model to lightgbm_v20250821_021618_fallback to indicate fallback status
+2025-08-21 02:16:18,890 - stage3_model_training.main_trainer - INFO - Saved model: lightgbm_v20250821_021618_fallback (Production ready: False)
+2025-08-21 02:16:18,891 - stage3_model_training.main_trainer - INFO - Successfully trained lightgbm: F1=1.000
+2025-08-21 02:16:18,891 - stage3_model_training.main_trainer - INFO - Training random_forest model...
+2025-08-21 02:16:22,991 - stage3_model_training.main_trainer - INFO - Best parameters for random_forest: {'max_depth': 5, 'min_samples_split': 2, 'n_estimators': 50}
+2025-08-21 02:16:23,330 - stage3_model_training.main_trainer - WARNING - Model random_forest_v20250821_021623 does not meet production thresholds:
+2025-08-21 02:16:23,331 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:16:23,331 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:16:23,332 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:16:23,332 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:16:23,332 - stage3_model_training.main_trainer - WARNING -   - CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!
+2025-08-21 02:16:23,333 - stage3_model_training.main_trainer - INFO - Renamed model to random_forest_v20250821_021623_fallback to indicate fallback status
+2025-08-21 02:16:23,352 - stage3_model_training.main_trainer - INFO - Saved model: random_forest_v20250821_021623_fallback (Production ready: False)
+2025-08-21 02:16:23,354 - stage3_model_training.main_trainer - INFO - Successfully trained random_forest: F1=1.000
+2025-08-21 02:16:23,354 - stage3_model_training.main_trainer - INFO - Selected best model: lightgbm_v20250821_021618 (F1: 1.000)
+2025-08-21 02:16:23,355 - stage3_model_training.main_trainer - INFO - Model training completed
+2025-08-21 02:16:23,355 - __main__ - INFO - 
+============================================================
+2025-08-21 02:16:23,355 - __main__ - INFO - MODEL RETRAINING RESULTS
+2025-08-21 02:16:23,355 - __main__ - INFO - ============================================================
+2025-08-21 02:16:23,356 - __main__ - ERROR - 
+XGBOOST: Failed to train - Training failed
+2025-08-21 02:16:23,358 - __main__ - INFO - 
+LIGHTGBM:
+2025-08-21 02:16:23,359 - __main__ - INFO -   Success: True
+2025-08-21 02:16:23,359 - __main__ - INFO -   Model Name: lightgbm_v20250821_021618
+2025-08-21 02:16:23,360 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 02:16:23,360 - __main__ - INFO -   Precision: 1.000
+2025-08-21 02:16:23,360 - __main__ - INFO -   Recall: 1.000
+2025-08-21 02:16:23,361 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 02:16:23,361 - __main__ - INFO -   CV F1-Score: 1.000 ± 0.000
+2025-08-21 02:16:23,365 - __main__ - INFO -   Production Ready: False
+2025-08-21 02:16:23,365 - __main__ - WARNING -   Warnings: ['SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!', 'CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!']
+2025-08-21 02:16:23,365 - __main__ - INFO - 
+RANDOM_FOREST:
+2025-08-21 02:16:23,366 - __main__ - INFO -   Success: True
+2025-08-21 02:16:23,366 - __main__ - INFO -   Model Name: random_forest_v20250821_021623
+2025-08-21 02:16:23,367 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 02:16:23,367 - __main__ - INFO -   Precision: 1.000
+2025-08-21 02:16:23,367 - __main__ - INFO -   Recall: 1.000
+2025-08-21 02:16:23,368 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 02:16:23,368 - __main__ - INFO -   CV F1-Score: 1.000 ± 0.000
+2025-08-21 02:16:23,369 - __main__ - INFO -   Production Ready: False
+2025-08-21 02:16:23,369 - __main__ - WARNING -   Warnings: ['SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!', 'CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!']
+2025-08-21 02:16:23,369 - __main__ - INFO - 
+============================================================
+2025-08-21 02:16:23,372 - __main__ - INFO - PRODUCTION STATUS
+2025-08-21 02:16:23,372 - __main__ - INFO - ============================================================
+2025-08-21 02:16:23,372 - __main__ - INFO - Production Ready Models (4):
+2025-08-21 02:16:23,373 - __main__ - INFO -   - lightgbm_v20250821_015804
+2025-08-21 02:16:23,373 - __main__ - INFO -   - lightgbm_v20250821_015949
+2025-08-21 02:16:23,374 - __main__ - INFO -   - random_forest_v20250821_015807
+2025-08-21 02:16:23,374 - __main__ - INFO -   - random_forest_v20250821_015952
+2025-08-21 02:16:23,374 - __main__ - INFO - Fallback Models (5):
+2025-08-21 02:16:23,375 - __main__ - INFO -   - lightgbm_v20250821_020527_fallback
+2025-08-21 02:16:23,375 - __main__ - INFO -   - random_forest_v20250821_020548_fallback
+2025-08-21 02:16:23,376 - __main__ - INFO -   - xgboost_v20250821_020429_fallback
+2025-08-21 02:16:23,376 - __main__ - INFO -   - lightgbm_v20250821_021618_fallback
+2025-08-21 02:16:23,376 - __main__ - INFO -   - random_forest_v20250821_021623_fallback
+2025-08-21 02:16:23,377 - __main__ - INFO - 
+============================================================
+2025-08-21 02:16:23,378 - __main__ - INFO - RECOMMENDATIONS
+2025-08-21 02:16:23,379 - __main__ - INFO - ============================================================
+2025-08-21 02:16:23,379 - __main__ - INFO - Models are ready for production use
+2025-08-21 02:16:23,380 - __main__ - INFO -    - Monitor performance in production
+2025-08-21 02:16:23,380 - __main__ - INFO -    - Set up automated retraining
+2025-08-21 02:16:23,381 - __main__ - INFO -    - Implement A/B testing
+2025-08-21 02:16:23,382 - __main__ - INFO - 
+Model retraining completed!
+2025-08-21 02:31:04,750 - __main__ - INFO - Starting model retraining with improved feature engineering...
+2025-08-21 02:31:04,770 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250820_202328
+2025-08-21 02:31:04,773 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015804
+2025-08-21 02:31:04,775 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_015949
+2025-08-21 02:31:04,785 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_020527_fallback
+2025-08-21 02:31:04,788 - stage3_model_training.main_trainer - INFO - Loaded model: lightgbm_v20250821_021618_fallback
+2025-08-21 02:31:04,808 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250820_202335
+2025-08-21 02:31:04,822 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015807
+2025-08-21 02:31:04,836 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_015952
+2025-08-21 02:31:04,852 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_020548_fallback
+2025-08-21 02:31:04,864 - stage3_model_training.main_trainer - INFO - Loaded model: random_forest_v20250821_021623_fallback
+2025-08-21 02:31:04,886 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250820_202303
+2025-08-21 02:31:04,893 - stage3_model_training.main_trainer - INFO - Loaded model: xgboost_v20250821_020429_fallback
+2025-08-21 02:31:04,894 - stage3_model_training.main_trainer - INFO - Stage 3 Model Training initialized successfully
+2025-08-21 02:31:04,896 - stage3_model_training.main_trainer - INFO - Model lightgbm_v20250821_015804 performance degraded, retraining needed
+2025-08-21 02:31:04,896 - __main__ - INFO - Retraining is needed, proceeding...
+2025-08-21 02:31:04,896 - __main__ - INFO - Retraining all models...
+2025-08-21 02:31:04,897 - stage3_model_training.main_trainer - INFO - Starting model training...
+2025-08-21 02:31:04,897 - stage3_model_training.main_trainer - INFO - Preparing training data from real financial sources...
+2025-08-21 02:31:20,545 - tensorflow - WARNING - From C:\Users\Nandini Nema\Hackathons\IITK CredTech Hackathon\Credit-Intelligence-Platform\.venv\Lib\site-packages\tf_keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+2025-08-21 02:31:20,817 - stage2_feature_engineering.kaggle_data_integration - INFO - Initializing Kaggle data integration...
+2025-08-21 02:31:20,818 - stage2_feature_engineering.kaggle_data_integration - WARNING - Kaggle credentials not provided - using cached datasets if available
+2025-08-21 02:31:20,818 - stage2_feature_engineering.kaggle_data_integration - INFO - To download fresh data, set KAGGLE_USERNAME and KAGGLE_KEY environment variables
+2025-08-21 02:31:20,819 - stage2_feature_engineering.kaggle_data_integration - INFO - Kaggle data integration initialized successfully
+2025-08-21 02:31:20,819 - stage3_model_training.main_trainer - INFO - Attempting to load Kaggle dataset: credit_score_classification
+2025-08-21 02:31:20,820 - stage2_feature_engineering.kaggle_data_integration - INFO - Loading training dataset: credit_score_classification
+2025-08-21 02:31:20,821 - stage2_feature_engineering.kaggle_data_integration - ERROR - Kaggle credentials required for downloading
+2025-08-21 02:31:20,821 - stage2_feature_engineering.kaggle_data_integration - ERROR - Could not load dataset: credit_score_classification
+2025-08-21 02:31:20,826 - stage3_model_training.main_trainer - INFO - Attempting to load Kaggle dataset: german_credit
+2025-08-21 02:31:20,826 - stage2_feature_engineering.kaggle_data_integration - INFO - Loading training dataset: german_credit
+2025-08-21 02:31:20,826 - stage2_feature_engineering.kaggle_data_integration - ERROR - Kaggle credentials required for downloading
+2025-08-21 02:31:20,827 - stage2_feature_engineering.kaggle_data_integration - ERROR - Could not load dataset: german_credit
+2025-08-21 02:31:20,827 - stage3_model_training.main_trainer - INFO - Attempting to load Kaggle dataset: loan_prediction
+2025-08-21 02:31:20,828 - stage2_feature_engineering.kaggle_data_integration - INFO - Loading training dataset: loan_prediction
+2025-08-21 02:31:20,828 - stage2_feature_engineering.kaggle_data_integration - ERROR - Kaggle credentials required for downloading
+2025-08-21 02:31:20,828 - stage2_feature_engineering.kaggle_data_integration - ERROR - Could not load dataset: loan_prediction
+2025-08-21 02:31:20,829 - stage3_model_training.main_trainer - WARNING - No Kaggle datasets could be loaded
+2025-08-21 02:31:20,840 - stage2_feature_engineering.real_data_integration - INFO - Initializing real financial data integration...
+2025-08-21 02:31:20,841 - stage2_feature_engineering.real_data_integration - WARNING - Alpha Vantage API key not provided - some features will be limited
+2025-08-21 02:31:20,841 - stage2_feature_engineering.real_data_integration - WARNING - News API key not provided - sentiment features will be limited
+2025-08-21 02:31:20,842 - stage2_feature_engineering.real_data_integration - INFO - Real data integration initialized successfully
+2025-08-21 02:31:20,843 - stage2_feature_engineering.real_data_integration - INFO - Building training dataset for 10 companies...
+2025-08-21 02:31:20,844 - stage2_feature_engineering.real_data_integration - INFO - Fetching financial data for 10 companies...
+2025-08-21 02:31:20,846 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for AAPL
+2025-08-21 02:31:20,846 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for MSFT
+2025-08-21 02:31:20,847 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for GOOGL
+2025-08-21 02:31:20,847 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for AMZN
+2025-08-21 02:31:20,848 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for TSLA
+2025-08-21 02:31:20,848 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for META
+2025-08-21 02:31:20,849 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for NVDA
+2025-08-21 02:31:20,850 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for NFLX
+2025-08-21 02:31:20,851 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for ADBE
+2025-08-21 02:31:20,852 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for CRM
+2025-08-21 02:31:20,857 - stage2_feature_engineering.real_data_integration - INFO - Successfully fetched data for 10 companies
+2025-08-21 02:31:20,858 - stage2_feature_engineering.real_data_integration - INFO - Fetching news sentiment data for 10 companies...
+2025-08-21 02:31:20,858 - stage2_feature_engineering.real_data_integration - WARNING - News API key not provided - using mock sentiment data
+2025-08-21 02:31:20,889 - stage2_feature_engineering.real_data_integration - INFO - Generating realistic credit outcomes...
+2025-08-21 02:31:20,892 - stage2_feature_engineering.real_data_integration - INFO - Generated credit outcomes: [10]
+2025-08-21 02:31:20,914 - stage2_feature_engineering.real_data_integration - INFO - Prepared 23 features
+2025-08-21 02:31:20,914 - stage2_feature_engineering.real_data_integration - INFO - Training dataset ready: 10 samples, 23 features
+2025-08-21 02:31:20,914 - stage3_model_training.main_trainer - INFO - Successfully loaded real financial data: 10 samples, 23 features
+2025-08-21 02:31:20,918 - stage3_model_training.main_trainer - INFO - Training xgboost model...
+2025-08-21 02:31:36,835 - stage3_model_training.main_trainer - INFO - Best parameters for xgboost: {'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 50}
+2025-08-21 02:31:37,088 - stage3_model_training.main_trainer - WARNING - Model xgboost_v20250821_023137 does not meet production thresholds:
+2025-08-21 02:31:37,089 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:37,089 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:37,090 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:37,090 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:37,090 - stage3_model_training.main_trainer - WARNING -   - CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!
+2025-08-21 02:31:37,091 - stage3_model_training.main_trainer - INFO - Renamed model to xgboost_v20250821_023137_fallback to indicate fallback status
+2025-08-21 02:31:37,097 - stage3_model_training.main_trainer - INFO - Saved model: xgboost_v20250821_023137_fallback (Production ready: False)
+2025-08-21 02:31:37,099 - stage3_model_training.main_trainer - INFO - Successfully trained xgboost: F1=1.000
+2025-08-21 02:31:37,100 - stage3_model_training.main_trainer - INFO - Training lightgbm model...
+2025-08-21 02:31:43,643 - stage3_model_training.main_trainer - INFO - Best parameters for lightgbm: {'learning_rate': 0.01, 'max_depth': 3, 'n_estimators': 50}
+2025-08-21 02:31:43,704 - stage3_model_training.main_trainer - WARNING - Model lightgbm_v20250821_023143 does not meet production thresholds:
+2025-08-21 02:31:43,704 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:43,704 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:43,705 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:43,705 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:43,705 - stage3_model_training.main_trainer - WARNING -   - CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!
+2025-08-21 02:31:43,705 - stage3_model_training.main_trainer - INFO - Renamed model to lightgbm_v20250821_023143_fallback to indicate fallback status
+2025-08-21 02:31:43,711 - stage3_model_training.main_trainer - INFO - Saved model: lightgbm_v20250821_023143_fallback (Production ready: False)
+2025-08-21 02:31:43,711 - stage3_model_training.main_trainer - INFO - Successfully trained lightgbm: F1=1.000
+2025-08-21 02:31:43,711 - stage3_model_training.main_trainer - INFO - Training random_forest model...
+2025-08-21 02:31:47,281 - stage3_model_training.main_trainer - INFO - Best parameters for random_forest: {'max_depth': 5, 'min_samples_split': 2, 'n_estimators': 50}
+2025-08-21 02:31:47,550 - stage3_model_training.main_trainer - WARNING - Model random_forest_v20250821_023147 does not meet production thresholds:
+2025-08-21 02:31:47,551 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:47,551 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:47,551 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:47,552 - stage3_model_training.main_trainer - WARNING -   - SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!
+2025-08-21 02:31:47,552 - stage3_model_training.main_trainer - WARNING -   - CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!
+2025-08-21 02:31:47,552 - stage3_model_training.main_trainer - INFO - Renamed model to random_forest_v20250821_023147_fallback to indicate fallback status
+2025-08-21 02:31:47,579 - stage3_model_training.main_trainer - INFO - Saved model: random_forest_v20250821_023147_fallback (Production ready: False)
+2025-08-21 02:31:47,579 - stage3_model_training.main_trainer - INFO - Successfully trained random_forest: F1=1.000
+2025-08-21 02:31:47,580 - stage3_model_training.main_trainer - INFO - Selected best model: xgboost_v20250821_023137 (F1: 1.000)
+2025-08-21 02:31:47,580 - stage3_model_training.main_trainer - INFO - Model training completed
+2025-08-21 02:31:47,581 - __main__ - INFO - 
+============================================================
+2025-08-21 02:31:47,581 - __main__ - INFO - MODEL RETRAINING RESULTS
+2025-08-21 02:31:47,581 - __main__ - INFO - ============================================================
+2025-08-21 02:31:47,582 - __main__ - INFO - 
+XGBOOST:
+2025-08-21 02:31:47,582 - __main__ - INFO -   Success: True
+2025-08-21 02:31:47,583 - __main__ - INFO -   Model Name: xgboost_v20250821_023137
+2025-08-21 02:31:47,584 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 02:31:47,584 - __main__ - INFO -   Precision: 1.000
+2025-08-21 02:31:47,590 - __main__ - INFO -   Recall: 1.000
+2025-08-21 02:31:47,590 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 02:31:47,591 - __main__ - INFO -   CV F1-Score: 1.000 ± 0.000
+2025-08-21 02:31:47,591 - __main__ - INFO -   Production Ready: False
+2025-08-21 02:31:47,592 - __main__ - WARNING -   Warnings: ['SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!', 'CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!']
+2025-08-21 02:31:47,592 - __main__ - INFO - 
+LIGHTGBM:
+2025-08-21 02:31:47,593 - __main__ - INFO -   Success: True
+2025-08-21 02:31:47,593 - __main__ - INFO -   Model Name: lightgbm_v20250821_023143
+2025-08-21 02:31:47,594 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 02:31:47,594 - __main__ - INFO -   Precision: 1.000
+2025-08-21 02:31:47,595 - __main__ - INFO -   Recall: 1.000
+2025-08-21 02:31:47,595 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 02:31:47,595 - __main__ - INFO -   CV F1-Score: 1.000 ± 0.000
+2025-08-21 02:31:47,595 - __main__ - INFO -   Production Ready: False
+2025-08-21 02:31:47,596 - __main__ - WARNING -   Warnings: ['SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!', 'CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!']
+2025-08-21 02:31:47,596 - __main__ - INFO - 
+RANDOM_FOREST:
+2025-08-21 02:31:47,597 - __main__ - INFO -   Success: True
+2025-08-21 02:31:47,597 - __main__ - INFO -   Model Name: random_forest_v20250821_023147
+2025-08-21 02:31:47,597 - __main__ - INFO -   Accuracy: 1.000
+2025-08-21 02:31:47,598 - __main__ - INFO -   Precision: 1.000
+2025-08-21 02:31:47,598 - __main__ - INFO -   Recall: 1.000
+2025-08-21 02:31:47,598 - __main__ - INFO -   F1-Score: 1.000
+2025-08-21 02:31:47,599 - __main__ - INFO -   CV F1-Score: 1.000 ± 0.000
+2025-08-21 02:31:47,599 - __main__ - INFO -   Production Ready: False
+2025-08-21 02:31:47,600 - __main__ - WARNING -   Warnings: ['SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!', 'SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!', 'CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!']
+2025-08-21 02:31:47,600 - __main__ - INFO - 
+============================================================
+2025-08-21 02:31:47,601 - __main__ - INFO - PRODUCTION STATUS
+2025-08-21 02:31:47,601 - __main__ - INFO - ============================================================
+2025-08-21 02:31:47,601 - __main__ - INFO - Production Ready Models (4):
+2025-08-21 02:31:47,601 - __main__ - INFO -   - lightgbm_v20250821_015804
+2025-08-21 02:31:47,602 - __main__ - INFO -   - lightgbm_v20250821_015949
+2025-08-21 02:31:47,602 - __main__ - INFO -   - random_forest_v20250821_015807
+2025-08-21 02:31:47,603 - __main__ - INFO -   - random_forest_v20250821_015952
+2025-08-21 02:31:47,603 - __main__ - INFO - Fallback Models (8):
+2025-08-21 02:31:47,603 - __main__ - INFO -   - lightgbm_v20250821_020527_fallback
+2025-08-21 02:31:47,604 - __main__ - INFO -   - lightgbm_v20250821_021618_fallback
+2025-08-21 02:31:47,604 - __main__ - INFO -   - random_forest_v20250821_020548_fallback
+2025-08-21 02:31:47,605 - __main__ - INFO -   - random_forest_v20250821_021623_fallback
+2025-08-21 02:31:47,605 - __main__ - INFO -   - xgboost_v20250821_020429_fallback
+2025-08-21 02:31:47,606 - __main__ - INFO -   - xgboost_v20250821_023137_fallback
+2025-08-21 02:31:47,606 - __main__ - INFO -   - lightgbm_v20250821_023143_fallback
+2025-08-21 02:31:47,606 - __main__ - INFO -   - random_forest_v20250821_023147_fallback
+2025-08-21 02:31:47,607 - __main__ - INFO - 
+============================================================
+2025-08-21 02:31:47,607 - __main__ - INFO - RECOMMENDATIONS
+2025-08-21 02:31:47,608 - __main__ - INFO - ============================================================
+2025-08-21 02:31:47,608 - __main__ - INFO - Models are ready for production use
+2025-08-21 02:31:47,608 - __main__ - INFO -    - Monitor performance in production
+2025-08-21 02:31:47,609 - __main__ - INFO -    - Set up automated retraining
+2025-08-21 02:31:47,609 - __main__ - INFO -    - Implement A/B testing
+2025-08-21 02:31:47,609 - __main__ - INFO - 
+Model retraining completed!

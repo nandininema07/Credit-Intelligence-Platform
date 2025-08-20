@@ -444,30 +444,33 @@ class AlertEngine:
     
     async def get_statistics(self) -> Dict[str, Any]:
         """Get alert engine statistics"""
-        
         try:
             stats = self.statistics.copy()
             
-            # Add current counts
-            stats.update({
-                'active_alerts_count': len(self.active_alerts),
-                'total_history_count': len(self.alert_history),
-                'suppression_rules_count': sum(len(rules) for rules in self.suppression_rules.values()),
-                'callbacks_registered': len(self.alert_callbacks)
-            })
+            # Calculate additional metrics
+            total_alerts = stats['total_alerts']
+            if total_alerts > 0:
+                stats['resolution_rate'] = round((stats['resolved_alerts'] / total_alerts) * 100, 2)
+                stats['suppression_rate'] = round((stats['suppressed_alerts'] / total_alerts) * 100, 2)
+            else:
+                stats['resolution_rate'] = 0
+                stats['suppression_rate'] = 0
             
-            # Add severity breakdown of active alerts
-            active_by_severity = {'low': 0, 'medium': 0, 'high': 0, 'critical': 0}
-            for alert in self.active_alerts.values():
-                active_by_severity[alert.severity.value] += 1
-            
-            stats['active_alerts_by_severity'] = active_by_severity
+            stats['active_alerts_count'] = len(self.active_alerts)
+            stats['last_activity'] = datetime.now().isoformat()
             
             return stats
             
         except Exception as e:
             logger.error(f"Error getting statistics: {e}")
             return {'error': str(e)}
+    
+    async def evaluate_alert_rules(self, company_id: str, data: Dict[str, Any]) -> List[Dict[str, Any]]:
+        """Evaluate alert rules for a company - compatibility method for AlertingEngine"""
+        # This method is called by AlertingEngine but AlertEngine doesn't have rule evaluation
+        # The rule evaluation is handled by RuleEngine in the AlertingEngine
+        logger.debug(f"AlertEngine evaluate_alert_rules called for company {company_id}")
+        return []
     
     async def export_alerts(self, company_id: str = None, hours: int = 24) -> Dict[str, Any]:
         """Export alerts for analysis"""

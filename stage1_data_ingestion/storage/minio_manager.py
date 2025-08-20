@@ -1,5 +1,5 @@
 """
-S3 data lake manager for storing and retrieving raw and processed data.
+MinIO data lake manager for storing and retrieving raw and processed data.
 Handles data organization, versioning, and lifecycle management.
 """
 
@@ -15,37 +15,43 @@ import gzip
 from botocore.exceptions import ClientError, NoCredentialsError
 import pandas as pd
 from io import StringIO, BytesIO
+import os
 
 logger = logging.getLogger(__name__)
 
-class S3Manager:
-    """S3 data lake operations manager"""
+class MinIOManager:
+    """MinIO data lake operations manager"""
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
-        self.bucket_name = config.get('s3_bucket', 'credit-intelligence-data-lake')
-        self.region = config.get('aws_region', 'us-east-1')
+        self.bucket_name = config.get('minio_bucket', 'credit-intelligence-data-lake')
+        self.endpoint_url = config.get('minio_endpoint', 'http://localhost:9000')
+        self.access_key = config.get('minio_access_key', 'admin')
+        self.secret_key = config.get('minio_secret_key', 'password123')
         
         try:
             self.s3_client = boto3.client(
                 's3',
-                region_name=self.region,
-                aws_access_key_id=config.get('aws_access_key_id'),
-                aws_secret_access_key=config.get('aws_secret_access_key')
+                endpoint_url=self.endpoint_url,
+                aws_access_key_id=self.access_key,
+                aws_secret_access_key=self.secret_key,
+                region_name='us-east-1'  # MinIO doesn't use regions like AWS
             )
             self.s3_resource = boto3.resource(
                 's3',
-                region_name=self.region,
-                aws_access_key_id=config.get('aws_access_key_id'),
-                aws_secret_access_key=config.get('aws_secret_access_key')
+                endpoint_url=self.endpoint_url,
+                aws_access_key_id=self.access_key,
+                aws_secret_access_key=self.secret_key,
+                region_name='us-east-1'
             )
-        except NoCredentialsError:
-            logger.error("AWS credentials not found")
+            logger.info(f"MinIO client initialized with endpoint: {self.endpoint_url}")
+        except Exception as e:
+            logger.error(f"Failed to initialize MinIO client: {e}")
             self.s3_client = None
             self.s3_resource = None
     
     def create_bucket_if_not_exists(self) -> bool:
-        """Create S3 bucket if it doesn't exist"""
+        """Create MinIO bucket if it doesn't exist"""
         if not self.s3_client:
             return False
             
@@ -57,13 +63,7 @@ class S3Manager:
             error_code = int(e.response['Error']['Code'])
             if error_code == 404:
                 try:
-                    if self.region == 'us-east-1':
-                        self.s3_client.create_bucket(Bucket=self.bucket_name)
-                    else:
-                        self.s3_client.create_bucket(
-                            Bucket=self.bucket_name,
-                            CreateBucketConfiguration={'LocationConstraint': self.region}
-                        )
+                    self.s3_client.create_bucket(Bucket=self.bucket_name)
                     logger.info(f"Created bucket {self.bucket_name}")
                     return True
                 except ClientError as create_error:
@@ -75,9 +75,9 @@ class S3Manager:
     
     async def upload_raw_data(self, data: Any, data_type: str, 
                             company: str, timestamp: datetime = None) -> Optional[str]:
-        """Upload raw data to S3 with organized structure"""
+        """Upload raw data to MinIO with organized structure"""
         if not self.s3_client:
-            logger.error("S3 client not available")
+            logger.error("MinIO client not available")
             return None
             
         if timestamp is None:
@@ -94,7 +94,7 @@ class S3Manager:
             json_data = json.dumps(data, default=str, ensure_ascii=False)
             compressed_data = gzip.compress(json_data.encode('utf-8'))
             
-            # Upload to S3
+            # Upload to MinIO
             self.s3_client.put_object(
                 Bucket=self.bucket_name,
                 Key=key,
@@ -109,7 +109,7 @@ class S3Manager:
                 }
             )
             
-            logger.info(f"Uploaded raw data to s3://{self.bucket_name}/{key}")
+            logger.info(f"Uploaded raw data to minio://{self.bucket_name}/{key}")
             return key
             
         except Exception as e:
@@ -120,7 +120,7 @@ class S3Manager:
                                   timestamp: datetime = None) -> Optional[str]:
         """Upload processed data as Parquet for efficient querying"""
         if not self.s3_client:
-            logger.error("S3 client not available")
+            logger.error("MinIO client not available")
             return None
             
         if timestamp is None:
@@ -135,7 +135,7 @@ class S3Manager:
             data.to_parquet(parquet_buffer, index=False, compression='snappy')
             parquet_buffer.seek(0)
             
-            # Upload to S3
+            # Upload to MinIO
             self.s3_client.put_object(
                 Bucket=self.bucket_name,
                 Key=key,
@@ -149,7 +149,7 @@ class S3Manager:
                 }
             )
             
-            logger.info(f"Uploaded processed data to s3://{self.bucket_name}/{key}")
+            logger.info(f"Uploaded processed data to minio://{self.bucket_name}/{key}")
             return key
             
         except Exception as e:
@@ -157,9 +157,9 @@ class S3Manager:
             return None
     
     async def download_data(self, key: str) -> Optional[Any]:
-        """Download data from S3"""
+        """Download data from MinIO"""
         if not self.s3_client:
-            logger.error("S3 client not available")
+            logger.error("MinIO client not available")
             return None
             
         try:
@@ -189,7 +189,7 @@ class S3Manager:
                             start_date: datetime = None, end_date: datetime = None) -> List[str]:
         """List data files with optional filtering"""
         if not self.s3_client:
-            logger.error("S3 client not available")
+            logger.error("MinIO client not available")
             return []
             
         try:
@@ -235,7 +235,7 @@ class S3Manager:
     async def delete_old_data(self, data_type: str, days_to_keep: int = 30) -> int:
         """Delete old data files to manage storage costs"""
         if not self.s3_client:
-            logger.error("S3 client not available")
+            logger.error("MinIO client not available")
             return 0
             
         cutoff_date = datetime.now() - timedelta(days=days_to_keep)
@@ -310,3 +310,24 @@ class S3Manager:
         except Exception as e:
             logger.error(f"Error getting data statistics: {e}")
             return {}
+    
+    async def test_connection(self) -> bool:
+        """Test MinIO connection"""
+        try:
+            if not self.s3_client:
+                return False
+            
+            # Try to list buckets
+            response = self.s3_client.list_buckets()
+            logger.info("MinIO connection test successful")
+            return True
+            
+        except Exception as e:
+            logger.error(f"MinIO connection test failed: {e}")
+            return False
+    
+    async def close(self):
+        """Close MinIO connections"""
+        # boto3 clients don't need explicit closing
+        logger.info("MinIO connections closed")
+

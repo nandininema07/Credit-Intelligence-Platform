@@ -12,7 +12,7 @@ import json
 logger = logging.getLogger(__name__)
 
 class SMSNotifier:
-    """SMS notification service using multiple providers"""
+    """SMS notification service using Twilio and webhook providers"""
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
@@ -32,7 +32,7 @@ class SMSNotifier:
     def _initialize_providers(self):
         """Initialize SMS providers"""
         
-        # Twilio provider
+        # Twilio provider (primary)
         twilio_config = self.config.get('twilio', {})
         if twilio_config.get('account_sid') and twilio_config.get('auth_token'):
             self.providers['twilio'] = {
@@ -42,16 +42,7 @@ class SMSNotifier:
                 'url': f"https://api.twilio.com/2010-04-01/Accounts/{twilio_config['account_sid']}/Messages.json"
             }
         
-        # AWS SNS provider
-        aws_config = self.config.get('aws_sns', {})
-        if aws_config.get('access_key') and aws_config.get('secret_key'):
-            self.providers['aws_sns'] = {
-                'access_key': aws_config['access_key'],
-                'secret_key': aws_config['secret_key'],
-                'region': aws_config.get('region', 'us-east-1')
-            }
-        
-        # Generic webhook provider
+        # Generic webhook provider (fallback)
         webhook_config = self.config.get('webhook', {})
         if webhook_config.get('url'):
             self.providers['webhook'] = {
@@ -60,7 +51,11 @@ class SMSNotifier:
                 'method': webhook_config.get('method', 'POST')
             }
         
+        # Set Twilio as default provider
         self.default_provider = self.config.get('default_provider', 'twilio')
+        
+        if not self.providers:
+            logger.warning("No SMS providers configured")
     
     async def send_alert_sms(self, alert_data: Dict[str, Any], 
                            phone_numbers: List[str]) -> bool:
@@ -140,8 +135,6 @@ class SMSNotifier:
         try:
             if provider == 'twilio':
                 return await self._send_twilio_sms(phone_number, message)
-            elif provider == 'aws_sns':
-                return await self._send_aws_sns_sms(phone_number, message)
             elif provider == 'webhook':
                 return await self._send_webhook_sms(phone_number, message)
             else:
@@ -186,23 +179,6 @@ class SMSNotifier:
                         
         except Exception as e:
             logger.error(f"Error sending Twilio SMS: {e}")
-            return False
-    
-    async def _send_aws_sns_sms(self, phone_number: str, message: str) -> bool:
-        """Send SMS via AWS SNS"""
-        
-        try:
-            # This would typically use boto3 for AWS SNS
-            # For demonstration, simulate the API call
-            
-            logger.info(f"AWS SNS SMS would be sent to {phone_number}")
-            logger.info(f"Message: {message}")
-            
-            # Simulate success
-            return True
-            
-        except Exception as e:
-            logger.error(f"Error sending AWS SNS SMS: {e}")
             return False
     
     async def _send_webhook_sms(self, phone_number: str, message: str) -> bool:

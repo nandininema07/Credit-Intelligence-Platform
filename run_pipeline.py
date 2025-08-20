@@ -137,11 +137,11 @@ class CreditIntelligencePipeline:
         while self.running:
             try:
                 # Get new data from Stage 1
-                companies = await self.stage1_pipeline.company_registry.get_monitored_companies()
+                companies = self.stage1_pipeline.company_registry.get_monitored_companies()
                 
                 for company in companies:
                     # Process features for each company
-                    await self.stage2_processor.process_company_features(company['name'])
+                    await self.stage2_processor.process_company_features(company.name)
                 
                 await asyncio.sleep(interval)
                 
@@ -240,7 +240,7 @@ class CreditIntelligencePipeline:
             
             # Overall health assessment
             healthy_stages = sum(1 for stage_status in status['stages'].values() 
-                               if stage_status.get('healthy', False))
+                               if isinstance(stage_status, dict) and stage_status.get('healthy', False))
             total_stages = len(status['stages'])
             
             status['healthy'] = healthy_stages >= total_stages * 0.8  # 80% threshold

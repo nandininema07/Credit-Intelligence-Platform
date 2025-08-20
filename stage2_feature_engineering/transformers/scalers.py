@@ -143,6 +143,34 @@ class FeatureScaler:
         """Fit scalers and transform data"""
         return self.fit(data).transform(data)
     
+    async def scale_features(self, features: Dict[str, float]) -> Dict[str, float]:
+        """Scale features from dictionary format - compatibility method for pipeline"""
+        if not features:
+            return {}
+        
+        try:
+            # Convert dictionary to DataFrame
+            features_df = pd.DataFrame([features])
+            
+            # If scalers are fitted, use them
+            if self.fitted:
+                scaled_df = self.transform(features_df)
+            else:
+                # If not fitted, just return original features
+                scaled_df = features_df
+            
+            # Convert back to dictionary
+            scaled_features = scaled_df.iloc[0].to_dict()
+            
+            # Remove any NaN values
+            scaled_features = {k: v for k, v in scaled_features.items() if not pd.isna(v)}
+            
+            return scaled_features
+            
+        except Exception as e:
+            logger.error(f"Error scaling features: {e}")
+            return features  # Return original features if scaling fails
+    
     def inverse_transform(self, data: pd.DataFrame) -> pd.DataFrame:
         """Inverse transform scaled data"""
         if not self.fitted:

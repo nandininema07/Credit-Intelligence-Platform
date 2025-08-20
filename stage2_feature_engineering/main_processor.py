@@ -104,30 +104,40 @@ class MainProcessor:
             market_features = await self._process_market_features(raw_data.get('market_data', []))
             features.update(market_features)
             
-            # Apply time series aggregation
-            aggregated_features = await self.time_series_agg.aggregate_features(features, company_name)
-            features.update(aggregated_features)
+            # Apply time series aggregation only if we have features to aggregate
+            if features:
+                try:
+                    # Convert features to DataFrame for aggregation
+                    features_df = pd.DataFrame([features])
+                    features_df['company'] = company_name
+                    features_df['timestamp'] = datetime.now()
+                    
+                    feature_columns = [col for col in features_df.columns if col not in ['company', 'timestamp']]
+                    aggregated_features = await self.time_series_agg.aggregate_features(
+                        features_df, feature_columns, 'timestamp', 'company'
+                    )
+                    
+                    # Extract aggregated features
+                    if not aggregated_features.empty:
+                        latest_features = aggregated_features.iloc[-1].to_dict()
+                        # Remove non-feature columns
+                        for col in ['company', 'timestamp', 'window', 'window_start', 'window_end', 'data_points']:
+                            latest_features.pop(col, None)
+                        features.update(latest_features)
+                except Exception as e:
+                    logger.warning(f"Time series aggregation failed for {company_name}: {e}")
             
             # Scale features
-            scaled_features = await self.feature_scaler.scale_features(features)
+            if features:
+                scaled_features = await self.feature_scaler.scale_features(features)
+            else:
+                scaled_features = {}
             
             # Store features
-            await self.feature_store.store_features(company_name, scaled_features)
+            if scaled_features:
+                await self.feature_store.store_features(company_name, scaled_features)
             
             processing_time = (datetime.now() - start_time).total_seconds()
-            
-            result = ProcessingResult(
-                company=company_name,
-                features=scaled_features,
-                metadata={
-                    'processing_time': processing_time,
-                    'feature_count': len(scaled_features),
-                    'data_sources': list(raw_data.keys())
-                },
-                processing_time=processing_time,
-                success=True,
-                errors=errors
-            )
             
             logger.info(f"Processed {len(scaled_features)} features for {company_name} in {processing_time:.2f}s")
             return scaled_features
@@ -139,11 +149,47 @@ class MainProcessor:
     async def _get_company_raw_data(self, company_name: str) -> Dict[str, Any]:
         """Get raw data for company from Stage 1"""
         # This would connect to Stage 1's storage
-        # For now, return mock data structure
+        # For now, return mock data structure with realistic financial data
         return {
-            'text_data': [],
-            'financial_data': [],
-            'market_data': []
+            'text_data': [
+                {'text': 'Company reported strong Q3 earnings', 'source': 'news', 'timestamp': '2025-08-20'},
+                {'text': 'Analysts downgrade stock rating', 'source': 'analyst_report', 'timestamp': '2025-08-19'},
+                {'text': 'New product launch successful', 'source': 'press_release', 'timestamp': '2025-08-18'}
+            ],
+            'financial_data': [
+                {
+                    'current_assets': 1500000,
+                    'current_liabilities': 800000,
+                    'total_assets': 5000000,
+                    'total_liabilities': 2500000,
+                    'total_equity': 2500000,
+                    'revenue': 8000000,
+                    'net_income': 1200000,
+                    'gross_profit': 3200000,
+                    'operating_income': 1800000,
+                    'ebitda': 2200000,
+                    'cash': 500000,
+                    'inventory': 300000,
+                    'accounts_receivable': 400000,
+                    'accounts_payable': 200000,
+                    'long_term_debt': 1500000,
+                    'short_term_debt': 300000,
+                    'market_cap': 8000000,
+                    'stock_price': 80.0,
+                    'shares_outstanding': 100000,
+                    'cost_of_goods_sold': 4800000
+                }
+            ],
+            'market_data': [
+                {
+                    'stock_price': 80.0,
+                    'volume': 1000000,
+                    'market_cap': 8000000,
+                    'pe_ratio': 15.0,
+                    'beta': 1.2,
+                    'dividend_yield': 0.025
+                }
+            ]
         }
     
     async def _process_nlp_features(self, text_data: List[Dict]) -> Dict[str, float]:
@@ -158,6 +204,16 @@ class MainProcessor:
             sentiments = await self.sentiment_analyzer.analyze_batch(text_data)
             features['sentiment_avg'] = np.mean([s['score'] for s in sentiments])
             features['sentiment_std'] = np.std([s['score'] for s in sentiments])
+            features['sentiment_range'] = np.max([s['score'] for s in sentiments]) - np.min([s['score'] for s in sentiments])
+            
+            # Sentiment distribution features
+            positive_sentiments = [s['score'] for s in sentiments if s['score'] > 0.1]
+            negative_sentiments = [s['score'] for s in sentiments if s['score'] < -0.1]
+            neutral_sentiments = [s['score'] for s in sentiments if -0.1 <= s['score'] <= 0.1]
+            
+            features['positive_sentiment_ratio'] = len(positive_sentiments) / len(sentiments) if sentiments else 0
+            features['negative_sentiment_ratio'] = len(negative_sentiments) / len(sentiments) if sentiments else 0
+            features['neutral_sentiment_ratio'] = len(neutral_sentiments) / len(sentiments) if sentiments else 0
             
             # Topic extraction
             topics = await self.topic_extractor.extract_topics(text_data)
@@ -169,11 +225,53 @@ class MainProcessor:
             features['entity_count'] = len(entities)
             features['entity_confidence_avg'] = np.mean([e['confidence'] for e in entities]) if entities else 0
             
+            # Entity type distribution
+            entity_types = {}
+            for entity in entities:
+                entity_type = entity.get('type', 'unknown')
+                entity_types[entity_type] = entity_types.get(entity_type, 0) + 1
+            
+            # Add entity type features
+            for entity_type, count in entity_types.items():
+                features[f'entity_{entity_type}_count'] = count
+            
             # Event detection
             events = await self.event_detector.detect_events(text_data)
             features['event_count'] = len(events)
             features['critical_event_count'] = len([e for e in events if e.get('severity') == 'critical'])
+            features['moderate_event_count'] = len([e for e in events if e.get('severity') == 'moderate'])
+            features['low_event_count'] = len([e for e in events if e.get('severity') == 'low'])
             
+            # Event severity score (weighted average)
+            severity_weights = {'critical': 3, 'moderate': 2, 'low': 1}
+            if events:
+                severity_scores = [severity_weights.get(e.get('severity', 'low'), 1) for e in events]
+                features['event_severity_score'] = np.mean(severity_scores)
+            else:
+                features['event_severity_score'] = 0
+            
+            # Text complexity features
+            total_words = sum(len(text['text'].split()) for text in text_data)
+            features['avg_words_per_text'] = total_words / len(text_data) if text_data else 0
+            
+            # Source diversity
+            sources = set(text['source'] for text in text_data)
+            features['source_diversity'] = len(sources)
+            
+            # Recent sentiment trend (if we have timestamps)
+            if len(text_data) > 1:
+                try:
+                    sorted_texts = sorted(text_data, key=lambda x: x.get('timestamp', ''))
+                    recent_sentiments = [s['score'] for s in sentiments[-3:]]  # Last 3
+                    if len(recent_sentiments) > 1:
+                        features['sentiment_trend'] = np.polyfit(range(len(recent_sentiments)), recent_sentiments, 1)[0]
+                    else:
+                        features['sentiment_trend'] = 0
+                except:
+                    features['sentiment_trend'] = 0
+            else:
+                features['sentiment_trend'] = 0
+                
         except Exception as e:
             logger.error(f"Error processing NLP features: {e}")
         
@@ -228,7 +326,7 @@ class MainProcessor:
             'components_initialized': True,
             'feature_store_connected': await self.feature_store.is_connected(),
             'last_processing_time': datetime.now(),
-            'processed_companies_count': await self.feature_store.get_company_count()
+            'processed_companies_count': self.feature_store.get_company_count()
         }
     
     async def cleanup(self):

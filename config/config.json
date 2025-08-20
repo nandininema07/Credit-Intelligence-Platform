@@ -115,13 +115,19 @@
       "username": "your-jira-email@example.com",
       "api_token": "your-jira-api-token",
       "project_key": "CREDIT"
+    },
+    "twilio": {
+      "account_sid": "your-twilio-account-sid",
+      "auth_token": "your-twilio-auth-token",
+      "from_number": "+1234567890"
     }
   },
-  "aws": {
-    "region": "us-east-1",
-    "s3_bucket": "credit-intelligence-data",
-    "access_key_id": null,
-    "secret_access_key": null
+  "minio": {
+    "endpoint": "http://localhost:9000",
+    "access_key": "admin",
+    "secret_key": "password123",
+    "bucket": "credit-intelligence-data-lake",
+    "secure": false
   },
   "api": {
     "host": "0.0.0.0",

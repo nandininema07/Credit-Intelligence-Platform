@@ -89,9 +89,108 @@ class ConfigManager:
         stage1_keys = self.config_data.get('stage1', {}).get('api_keys', {})
         api_keys = self.config_data.get('api_keys', {})
         
+        # Try multiple environment variable patterns
+        env_vars = [
+            f"{service.upper()}_API_KEY",
+            f"{service.upper()}_KEY", 
+            f"{service.upper()}_TOKEN",
+            f"{service.upper()}_BEARER_TOKEN",
+            f"{service.upper()}_ACCESS_TOKEN"
+        ]
+        
+        for env_var in env_vars:
+            value = os.getenv(env_var)
+            if value and value not in ['your-newsapi-key', 'your-twitter-bearer-token', 'your-alpha-vantage-key']:
+                return value
+        
         return (stage1_keys.get(service) or 
-                api_keys.get(service) or 
-                os.getenv(f"{service.upper()}_API_KEY"))
+                api_keys.get(service))
+    
+    def get_all_api_keys(self) -> Dict[str, Any]:
+        """Get all API keys from environment variables and config files"""
+        api_keys = {}
+        
+        # Common API key environment variables
+        env_key_mappings = {
+            'NEWSAPI_KEY': 'newsapi',
+            'ALPHA_VANTAGE_KEY': 'alpha_vantage',
+            'FRED_KEY': 'fred',
+            'FINNHUB_KEY': 'finnhub',
+            'POLYGON_KEY': 'polygon',
+            'TWITTER_BEARER_TOKEN': 'twitter_bearer_token',
+            'REDDIT_CLIENT_ID': 'reddit_client_id',
+            'REDDIT_CLIENT_SECRET': 'reddit_client_secret',
+            'OPENAI_API_KEY': 'openai',
+            'HUGGINGFACE_TOKEN': 'huggingface',
+            'SLACK_BOT_TOKEN': 'slack_bot_token',
+            'SLACK_WEBHOOK_URL': 'slack_webhook_url',
+            'JIRA_API_TOKEN': 'jira_api_token',
+            'SMTP_USERNAME': 'smtp_username',
+            'SMTP_PASSWORD': 'smtp_password'
+        }
+        
+        # Load from environment variables
+        for env_var, key_name in env_key_mappings.items():
+            value = os.getenv(env_var)
+            if value and value not in ['your-newsapi-key', 'your-twitter-bearer-token', 'your-alpha-vantage-key', 'your-openai-api-key']:
+                api_keys[key_name] = value
+        
+        # Load from config files as fallback
+        stage1_keys = self.config_data.get('stage1', {}).get('api_keys', {})
+        config_keys = self.config_data.get('api_keys', {})
+        
+        # Merge config keys (environment variables take precedence)
+        for key, value in stage1_keys.items():
+            if key not in api_keys:
+                api_keys[key] = value
+                
+        for key, value in config_keys.items():
+            if key not in api_keys:
+                api_keys[key] = value
+        
+        # Convert flat keys to nested structure for backward compatibility
+        nested_api_keys = {}
+        
+        # Simple keys
+        for key in ['newsapi', 'alpha_vantage', 'fred', 'finnhub', 'polygon', 'openai', 'huggingface']:
+            if key in api_keys:
+                nested_api_keys[key] = api_keys[key]
+        
+        # Twitter nested structure
+        if 'twitter_bearer_token' in api_keys:
+            nested_api_keys['twitter'] = {
+                'bearer_token': api_keys['twitter_bearer_token'],
+                'api_key': api_keys.get('twitter_api_key', ''),
+                'api_secret': api_keys.get('twitter_api_secret', ''),
+                'access_token': api_keys.get('twitter_access_token', ''),
+                'access_token_secret': api_keys.get('twitter_access_token_secret', '')
+            }
+        
+        # Reddit nested structure
+        if 'reddit_client_id' in api_keys or 'reddit_client_secret' in api_keys:
+            nested_api_keys['reddit'] = {
+                'client_id': api_keys.get('reddit_client_id', ''),
+                'client_secret': api_keys.get('reddit_client_secret', ''),
+                'user_agent': 'CreditIntelligence/1.0'
+            }
+        
+        # Slack nested structure
+        if 'slack_bot_token' in api_keys or 'slack_webhook_url' in api_keys:
+            nested_api_keys['slack'] = {
+                'bot_token': api_keys.get('slack_bot_token', ''),
+                'webhook_url': api_keys.get('slack_webhook_url', '')
+            }
+        
+        # Email nested structure
+        if 'smtp_username' in api_keys or 'smtp_password' in api_keys:
+            nested_api_keys['email'] = {
+                'smtp_server': 'smtp.gmail.com',
+                'smtp_port': 587,
+                'username': api_keys.get('smtp_username', ''),
+                'password': api_keys.get('smtp_password', '')
+            }
+        
+        return nested_api_keys
     
     def get_stage_config(self, stage: str) -> Dict[str, Any]:
         """Get configuration for specific stage"""

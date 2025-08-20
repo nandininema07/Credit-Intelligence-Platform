@@ -37,6 +37,16 @@ class DataIngestionPipeline:
         self.config = config
         self.company_registry = CompanyRegistry(config.get('company_registry', {}))
         
+        # Get API keys from environment variables using ConfigManager
+        from shared.utils.config_manager import ConfigManager
+        config_manager = ConfigManager()
+        api_keys = config_manager.get_all_api_keys()
+        
+        # Merge API keys into config for backward compatibility
+        if 'api_keys' not in self.config:
+            self.config['api_keys'] = {}
+        self.config['api_keys'].update(api_keys)
+        
         # Initialize multi-source data collector
         try:
             from .data_processing.multi_source_collector import MultiSourceDataCollector

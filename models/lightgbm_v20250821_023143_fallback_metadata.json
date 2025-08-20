@@ -1,0 +1,58 @@
+{
+  "model_name": "lightgbm_v20250821_023143_fallback",
+  "model_type": "LGBMClassifier",
+  "performance": {
+    "accuracy": 1.0,
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1_score": 1.0,
+    "cv_f1_mean": 1.0,
+    "cv_f1_std": 0.0,
+    "overfitting_warning": false,
+    "validation_passed": false,
+    "validation_warnings": [
+      "SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!",
+      "SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!",
+      "SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!",
+      "SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!",
+      "CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!"
+    ]
+  },
+  "feature_names": [
+    "debt_to_equity",
+    "current_ratio",
+    "quick_ratio",
+    "pe_ratio",
+    "pb_ratio",
+    "roe",
+    "roa",
+    "gross_profit_margin",
+    "operating_margin",
+    "net_profit_margin",
+    "revenue_growth",
+    "earnings_growth",
+    "dividend_yield",
+    "sentiment_avg",
+    "sentiment_std",
+    "positive_ratio",
+    "negative_ratio",
+    "article_count",
+    "critical_events",
+    "volatility",
+    "beta",
+    "financial_health_score",
+    "profitability_score"
+  ],
+  "training_date": "2025-08-21T02:31:43.709928",
+  "last_trained": "2025-08-21T02:31:43.709938",
+  "feature_count": 23,
+  "production_ready": false,
+  "validation_warnings": [
+    "SUSPICIOUS: accuracy too high (1.000) - likely overfitting or data leakage!",
+    "SUSPICIOUS: precision too high (1.000) - likely overfitting or data leakage!",
+    "SUSPICIOUS: recall too high (1.000) - likely overfitting or data leakage!",
+    "SUSPICIOUS: f1_score too high (1.000) - likely overfitting or data leakage!",
+    "CRITICAL: Multiple metrics >95% - likely overfitting or data leakage!"
+  ],
+  "fallback_model": true
+}

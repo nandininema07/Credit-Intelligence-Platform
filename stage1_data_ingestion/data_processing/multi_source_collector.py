@@ -7,7 +7,7 @@ import asyncio
 import json
 import logging
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 import aiohttp
@@ -45,8 +45,8 @@ class DataPoint:
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for storage"""
         data = asdict(self)
-        if self.published_date:
-            data['published_date'] = self.published_date.isoformat()
+        # Keep datetime objects as-is for proper database handling
+        # The database layer will handle the conversion if needed
         return data
 
 class DataProcessor:
@@ -75,7 +75,15 @@ class DataProcessor:
     @staticmethod
     def generate_id(source_type: str, url: str, published_date: datetime) -> str:
         """Generate unique ID for data point"""
-        content = f"{source_type}_{url}_{published_date.isoformat() if published_date else datetime.utcnow().isoformat()}"
+        if published_date:
+            # Ensure timezone-aware
+            if published_date.tzinfo is None:
+                published_date = published_date.replace(tzinfo=timezone.utc)
+            date_str = published_date.isoformat()
+        else:
+            date_str = datetime.now(timezone.utc).isoformat()
+        
+        content = f"{source_type}_{url}_{date_str}"
         return hashlib.sha256(content.encode()).hexdigest()
 
 class NewsApiScraper:
@@ -94,11 +102,14 @@ class NewsApiScraper:
         for company in companies:
             for language in languages:
                 try:
+                    # Add delay between requests to avoid rate limiting
+                    await asyncio.sleep(0.5)  # 500ms delay between requests
+                    
                     articles = self.client.get_everything(
                         q=f"{company} OR ${company}",
                         language=language,
                         sort_by='publishedAt',
-                        from_param=(datetime.now() - timedelta(days=1)).strftime('%Y-%m-%d'),
+                        from_param=(datetime.now(timezone.utc) - timedelta(days=1)).strftime('%Y-%m-%d'),
                         page_size=20
                     )
                     
@@ -121,7 +132,11 @@ class NewsApiScraper:
                         data_points.append(data_point)
                         
                 except Exception as e:
-                    logger.error(f"Error scraping NewsAPI for {company}: {e}")
+                    if "429" in str(e) or "rate" in str(e).lower():
+                        logger.warning(f"NewsAPI rate limit hit for {company}, skipping...")
+                        await asyncio.sleep(60)  # Wait 1 minute before next request
+                    else:
+                        logger.error(f"Error scraping NewsAPI for {company}: {e}")
                     
         return data_points
 
@@ -140,10 +155,15 @@ class TwitterScraper:
         data_points = []
         for company in companies:
             try:
+                # Add delay between requests to avoid rate limiting
+                await asyncio.sleep(1)  # 1 second delay between companies
+                
                 tweets = self.client.search_recent_tweets(
-                    query=f"${company} OR {company} -is:retweet lang:en",
+                    query=f"{company} OR ${company} -is:retweet lang:en",
                     max_results=50,
-                    tweet_fields=['created_at', 'author_id', 'public_metrics', 'lang', 'context_annotations']
+                    tweet_fields=['created_at', 'author_id', 'public_metrics', 'lang', 'context_annotations'],
+                    user_fields=['username', 'verified', 'public_metrics'],
+                    expansions=['author_id']
                 )
                 
                 if tweets.data:
@@ -169,7 +189,12 @@ class TwitterScraper:
                         data_points.append(data_point)
                         
             except Exception as e:
-                logger.error(f"Error scraping Twitter for {company}: {e}")
+                if "429" in str(e):
+                    logger.warning(f"Twitter rate limit hit for {company}, skipping...")
+                    # Add longer delay for rate limit
+                    await asyncio.sleep(60)  # Wait 1 minute before next request
+                else:
+                    logger.error(f"Error scraping Twitter for {company}: {e}")
                 
         return data_points
 
@@ -178,52 +203,73 @@ class RedditScraper:
     
     def __init__(self, client_id: str, client_secret: str):
         if client_id and client_secret:
-            self.reddit = praw.Reddit(
-                client_id=client_id,
-                client_secret=client_secret,
-                user_agent="credtech_scraper/1.0"
-            )
+            try:
+                import praw
+                self.reddit = praw.Reddit(
+                    client_id=client_id,
+                    client_secret=client_secret,
+                    user_agent="credtech_scraper/1.0"
+                )
+                # Test connection
+                self.reddit.user.me()
+                logger.info("Reddit API connection successful")
+            except Exception as e:
+                logger.warning(f"Reddit API connection failed: {e}")
+                self.reddit = None
         else:
             self.reddit = None
+            logger.warning("Reddit credentials not provided")
             
     async def scrape_reddit(self, companies: List[str]) -> List[DataPoint]:
-        """Scrape Reddit posts and comments"""
+        """Scrape Reddit posts mentioning companies"""
         if not self.reddit:
-            logger.warning("Reddit credentials not provided")
+            logger.warning("Reddit client not available")
             return []
             
         data_points = []
-        subreddits = ['investing', 'stocks', 'SecurityAnalysis', 'ValueInvesting', 'financialindependence', 'wallstreetbets']
-        
         for company in companies:
-            for subreddit_name in subreddits:
-                try:
-                    subreddit = self.reddit.subreddit(subreddit_name)
-                    for submission in subreddit.search(f"{company} OR ${company}", limit=10, time_filter='day'):
-                        content = f"{submission.title} {submission.selftext}"
-                        data_point = DataPoint(
-                            source_type='reddit',
-                            source_name=f"r/{subreddit_name}",
-                            company_ticker=company,
-                            company_name=None,
-                            content_type='social',
-                            language='en',
-                            title=submission.title,
-                            content=submission.selftext,
-                            url=submission.url,
-                            published_date=datetime.fromtimestamp(submission.created_utc),
-                            sentiment_score=DataProcessor.calculate_sentiment(content),
-                            metadata={
-                                'score': submission.score,
-                                'num_comments': submission.num_comments,
-                                'author': str(submission.author) if submission.author else 'deleted'
-                            }
-                        )
-                        data_points.append(data_point)
-                        
-                except Exception as e:
-                    logger.error(f"Error scraping Reddit r/{subreddit_name} for {company}: {e}")
+            try:
+                # Add delay between requests
+                await asyncio.sleep(1)
+                
+                # Always use sync PRAW in thread pool to avoid async/sync issues
+                loop = asyncio.get_event_loop()
+                posts = await loop.run_in_executor(None, self._scrape_reddit_sync, company)
+                data_points.extend(posts)
                     
+            except Exception as e:
+                logger.error(f"Error scraping Reddit for {company}: {e}")
+                
+        return data_points
+    
+    def _scrape_reddit_sync(self, company: str) -> List[DataPoint]:
+        """Synchronous Reddit scraping for compatibility"""
+        data_points = []
+        try:
+            subreddit = self.reddit.subreddit("investing+stocks+wallstreetbets")
+            for post in subreddit.search(company, limit=20, sort='hot'):
+                if post.score > 5:  # Only high-quality posts
+                    data_points.append(DataPoint(
+                        source_type='reddit',
+                        source_name='reddit',
+                        company_ticker=company,
+                        company_name=None,
+                        content_type='post',
+                        language='en',
+                        title=post.title,
+                        content=post.title + '\n' + post.selftext,
+                        url=post.url,
+                        published_date=datetime.fromtimestamp(post.created_utc, tz=timezone.utc),
+                        sentiment_score=DataProcessor.calculate_sentiment(post.title + '\n' + post.selftext),
+                        metadata={
+                            'subreddit': str(post.subreddit),
+                            'score': post.score,
+                            'comments': post.num_comments,
+                            'author': str(post.author) if post.author else 'deleted'
+                        }
+                    ))
+        except Exception as e:
+            logger.error(f"Error in sync Reddit scraping for {company}: {e}")
         return data_points
 
 class YahooFinanceScraper:
@@ -576,18 +622,23 @@ class MultiSourceDataCollector:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         
-        # Initialize all scrapers
-        self.news_scraper = NewsApiScraper(config.get('NEWSAPI_KEY'))
-        self.twitter_scraper = TwitterScraper(config.get('TWITTER_BEARER_TOKEN'))
+        # Get API keys from environment variables using ConfigManager
+        from shared.utils.config_manager import ConfigManager
+        config_manager = ConfigManager()
+        api_keys = config_manager.get_all_api_keys()
+        
+        # Initialize all scrapers with API keys from environment variables
+        self.news_scraper = NewsApiScraper(api_keys.get('newsapi'))
+        self.twitter_scraper = TwitterScraper(api_keys.get('twitter', {}).get('bearer_token'))
         self.reddit_scraper = RedditScraper(
-            config.get('REDDIT_CLIENT_ID'),
-            config.get('REDDIT_CLIENT_SECRET')
+            api_keys.get('reddit', {}).get('client_id'),
+            api_keys.get('reddit', {}).get('client_secret')
         )
         self.yahoo_scraper = YahooFinanceScraper()
-        self.alpha_vantage_scraper = AlphaVantageScraper(config.get('ALPHA_VANTAGE_KEY'))
-        self.fred_scraper = FREDScraper(config.get('FRED_KEY'))
-        self.finnhub_scraper = FinnhubScraper(config.get('FINNHUB_KEY'))
-        self.polygon_scraper = PolygonScraper(config.get('POLYGON_KEY'))
+        self.alpha_vantage_scraper = AlphaVantageScraper(api_keys.get('alpha_vantage'))
+        self.fred_scraper = FREDScraper(api_keys.get('fred'))
+        self.finnhub_scraper = FinnhubScraper(api_keys.get('finnhub'))
+        self.polygon_scraper = PolygonScraper(api_keys.get('polygon'))
         self.rss_scraper = RSSFeedScraper()
         
         # Initialize SEC filing scraper
@@ -672,8 +723,12 @@ class MultiSourceDataCollector:
             if dp.language:
                 stats['languages'].add(dp.language)
             
-            # Date range
+            # Date range - ensure timezone-aware comparison
             if dp.published_date:
+                # Ensure timezone-aware
+                if dp.published_date.tzinfo is None:
+                    dp.published_date = dp.published_date.replace(tzinfo=timezone.utc)
+                
                 if not stats['date_range']['earliest'] or dp.published_date < stats['date_range']['earliest']:
                     stats['date_range']['earliest'] = dp.published_date
                 if not stats['date_range']['latest'] or dp.published_date > stats['date_range']['latest']:

@@ -44,13 +44,17 @@ class RatioCalculator:
         efficiency_ratios = self._calculate_efficiency_ratios(aggregated_data)
         market_ratios = self._calculate_market_ratios(aggregated_data)
         
-        # Combine all ratios
+        # Calculate additional credit-specific metrics
+        credit_metrics = self._calculate_credit_metrics(aggregated_data)
+        
+        # Combine all ratios with meaningful names
         all_ratios = {}
         all_ratios.update({f'liquidity_{k}': v for k, v in liquidity_ratios.items()})
         all_ratios.update({f'profitability_{k}': v for k, v in profitability_ratios.items()})
         all_ratios.update({f'leverage_{k}': v for k, v in leverage_ratios.items()})
         all_ratios.update({f'efficiency_{k}': v for k, v in efficiency_ratios.items()})
         all_ratios.update({f'market_{k}': v for k, v in market_ratios.items()})
+        all_ratios.update(credit_metrics)
         
         logger.info(f"Calculated {len(all_ratios)} financial ratios")
         return all_ratios
@@ -299,6 +303,95 @@ class RatioCalculator:
             ratios['ev_to_ebitda'] = 0.0
         
         return ratios
+    
+    def _calculate_credit_metrics(self, data: Dict[str, float]) -> Dict[str, float]:
+        """Calculate additional credit-specific metrics"""
+        credit_metrics = {}
+        
+        try:
+            # Cash Flow to Total Debt Ratio
+            if data['total_liabilities'] > 0:
+                cash_flow = data['net_income'] + data.get('depreciation', 0) + data.get('amortization', 0)
+                credit_metrics['cash_flow_to_debt'] = cash_flow / data['total_liabilities']
+            else:
+                credit_metrics['cash_flow_to_debt'] = 0.0
+            
+            # Operating Cash Flow to Total Debt
+            if data['total_liabilities'] > 0:
+                operating_cash_flow = data['operating_income'] + data.get('depreciation', 0) + data.get('amortization', 0)
+                credit_metrics['operating_cash_flow_to_debt'] = operating_cash_flow / data['total_liabilities']
+            else:
+                credit_metrics['operating_cash_flow_to_debt'] = 0.0
+            
+            # Free Cash Flow to Total Debt
+            if data['total_liabilities'] > 0:
+                capex = data.get('capital_expenditure', 0)
+                free_cash_flow = data['operating_income'] - capex
+                credit_metrics['free_cash_flow_to_debt'] = free_cash_flow / data['total_liabilities']
+            else:
+                credit_metrics['free_cash_flow_to_debt'] = 0.0
+            
+            # Net Working Capital to Total Assets
+            if data['total_assets'] > 0:
+                net_working_capital = data['current_assets'] - data['current_liabilities']
+                credit_metrics['net_working_capital_to_assets'] = net_working_capital / data['total_assets']
+            else:
+                credit_metrics['net_working_capital_to_assets'] = 0.0
+            
+            # Retained Earnings to Total Assets
+            if data['total_assets'] > 0:
+                retained_earnings = data.get('retained_earnings', data['total_equity'])
+                credit_metrics['retained_earnings_to_assets'] = retained_earnings / data['total_assets']
+            else:
+                credit_metrics['retained_earnings_to_assets'] = 0.0
+            
+            # EBITDA to Total Assets
+            if data['total_assets'] > 0:
+                credit_metrics['ebitda_to_assets'] = data['ebitda'] / data['total_assets']
+            else:
+                credit_metrics['ebitda_to_assets'] = 0.0
+            
+            # Revenue to Total Assets (Asset Turnover)
+            if data['total_assets'] > 0:
+                credit_metrics['asset_turnover'] = data['revenue'] / data['total_assets']
+            else:
+                credit_metrics['asset_turnover'] = 0.0
+            
+            # Inventory Turnover
+            if data['inventory'] > 0:
+                credit_metrics['inventory_turnover'] = data['cost_of_goods_sold'] / data['inventory']
+            else:
+                credit_metrics['inventory_turnover'] = 0.0
+            
+            # Receivables Turnover
+            if data['accounts_receivable'] > 0:
+                credit_metrics['receivables_turnover'] = data['revenue'] / data['accounts_receivable']
+            else:
+                credit_metrics['receivables_turnover'] = 0.0
+            
+            # Payables Turnover
+            if data['accounts_payable'] > 0:
+                credit_metrics['payables_turnover'] = data['cost_of_goods_sold'] / data['accounts_payable']
+            else:
+                credit_metrics['payables_turnover'] = 0.0
+                
+        except Exception as e:
+            logger.error(f"Error calculating credit metrics: {e}")
+            # Return default values on error
+            credit_metrics = {
+                'cash_flow_to_debt': 0.0,
+                'operating_cash_flow_to_debt': 0.0,
+                'free_cash_flow_to_debt': 0.0,
+                'net_working_capital_to_assets': 0.0,
+                'retained_earnings_to_assets': 0.0,
+                'ebitda_to_assets': 0.0,
+                'asset_turnover': 0.0,
+                'inventory_turnover': 0.0,
+                'receivables_turnover': 0.0,
+                'payables_turnover': 0.0
+            }
+        
+        return credit_metrics
     
     def calculate_ratio_trends(self, historical_ratios: List[Dict[str, float]]) -> Dict[str, Any]:
         """Calculate trends in financial ratios over time"""

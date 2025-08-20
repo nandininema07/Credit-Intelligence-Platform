@@ -454,3 +454,14 @@ class SlackIntegration:
         except Exception as e:
             logger.error(f"Error getting statistics: {e}")
             return {'error': str(e)}
+
+    async def send_alert(self, alert: Dict[str, Any]) -> bool:
+        """Send alert to Slack - compatibility method for AlertingEngine"""
+        return await self.send_alert_notification(alert)
+    
+    async def process_queue(self):
+        """Process Slack notification queue - placeholder for compatibility"""
+        # This method is called by AlertingEngine but SlackIntegration doesn't use a queue
+        # All messages are sent immediately when send_message is called
+        logger.debug("SlackIntegration process_queue called - no queue processing needed")
+        return True

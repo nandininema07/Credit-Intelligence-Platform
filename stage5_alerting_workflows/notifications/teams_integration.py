@@ -410,25 +410,26 @@ class TeamsIntegration:
             logger.error(f"Error testing Teams connection: {e}")
             return False
     
-    async def get_statistics(self) -> Dict[str, Any]:
-        """Get Teams integration statistics"""
-        
+    def get_statistics(self) -> Dict[str, Any]:
+        """Get integration statistics"""
         try:
-            stats = self.statistics.copy()
-            
-            # Calculate success rate
-            total_attempts = stats['messages_sent'] + stats['messages_failed']
-            success_rate = (stats['messages_sent'] / total_attempts * 100) if total_attempts > 0 else 0
-            
-            stats.update({
-                'total_attempts': total_attempts,
-                'success_rate': round(success_rate, 2),
-                'configured_webhooks': len(self.webhook_urls),
-                'default_channel': self.default_channel
-            })
-            
-            return stats
-            
+            return {
+                'messages_sent': self.statistics['messages_sent'],
+                'messages_failed': self.statistics['messages_failed'],
+                'channels_used': self.statistics['channels_used'],
+                'last_activity': datetime.now().isoformat()
+            }
         except Exception as e:
             logger.error(f"Error getting statistics: {e}")
             return {'error': str(e)}
+    
+    async def send_alert(self, alert: Dict[str, Any]) -> bool:
+        """Send alert to Teams - compatibility method for AlertingEngine"""
+        return await self.send_alert_notification(alert)
+    
+    async def process_queue(self):
+        """Process Teams notification queue - placeholder for compatibility"""
+        # This method is called by AlertingEngine but TeamsIntegration doesn't use a queue
+        # All messages are sent immediately when send_message is called
+        logger.debug("TeamsIntegration process_queue called - no queue processing needed")
+        return True

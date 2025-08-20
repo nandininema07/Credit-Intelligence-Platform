@@ -268,3 +268,51 @@ class MetricsCollector:
             except Exception as e:
                 logger.error(f"Error in metrics collection: {e}")
                 await asyncio.sleep(interval)
+    
+    def get_metrics(self) -> Dict[str, Any]:
+        """Get current metrics summary"""
+        return {
+            'counters': dict(self.counters),
+            'timers': {k: self._calculate_stats(v) for k, v in self.timers.items()},
+            'buffer_sizes': {k: len(v) for k, v in self.metrics_buffer.items()},
+            'last_updated': datetime.now().isoformat()
+        }
+    
+    async def record_ingestion_cycle(self, data_points_count: int, stats: Dict[str, Any]) -> None:
+        """Record metrics for an ingestion cycle - compatibility method for pipeline"""
+        try:
+            # Record data points count
+            self.increment_counter('ingestion_cycle_data_points', {'total': str(data_points_count)})
+            
+            # Record by source
+            for source, count in stats.get('by_source', {}).items():
+                self.increment_counter('ingestion_by_source', {'source': source, 'count': str(count)})
+            
+            # Record by content type
+            for content_type, count in stats.get('by_content_type', {}).items():
+                self.increment_counter('ingestion_by_content_type', {'type': content_type, 'count': str(count)})
+            
+            # Record by company
+            for company, count in stats.get('by_company', {}).items():
+                self.increment_counter('ingestion_by_company', {'company': company, 'count': str(count)})
+            
+            # Record languages
+            for language in stats.get('languages', []):
+                self.increment_counter('ingestion_by_language', {'language': language})
+            
+            logger.debug(f"Recorded ingestion cycle metrics: {data_points_count} data points")
+            
+        except Exception as e:
+            logger.error(f"Error recording ingestion cycle metrics: {e}")
+    
+    def _calculate_stats(self, values: List[float]) -> Dict[str, float]:
+        """Calculate statistics for a list of values"""
+        if not values:
+            return {'count': 0, 'min': 0, 'max': 0, 'avg': 0}
+        
+        return {
+            'count': len(values),
+            'min': min(values),
+            'max': max(values),
+            'avg': sum(values) / len(values)
+        }
