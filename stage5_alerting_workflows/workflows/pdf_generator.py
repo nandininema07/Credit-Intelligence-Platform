@@ -47,6 +47,11 @@ class PDFGenerator:
         if not REPORTLAB_AVAILABLE:
             logger.warning("ReportLab not available. PDF generation will be limited.")
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("PDFGenerator initialized successfully")
+        return True
+    
     async def generate_alert_report(self, alert_data: Dict[str, Any]) -> Optional[str]:
         """Generate PDF report for a single alert"""
         

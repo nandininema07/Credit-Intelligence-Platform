@@ -50,17 +50,21 @@ class TrendMonitor:
     
     def __init__(self, config: Dict[str, Any]):
         self.config = config
-        self.historical_data = {}
-        self.trend_cache = {}
-        self.trend_alerts = []
+        self.trend_data = {}
+        self.analysis_results = []
         self.statistics = {
             'trends_analyzed': 0,
             'upward_trends': 0,
             'downward_trends': 0,
-            'trend_reversals': 0,
+            'stable_periods': 0,
             'volatile_periods': 0
         }
         self._initialize_monitor()
+    
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("TrendMonitor initialized successfully")
+        return True
     
     def _initialize_monitor(self):
         """Initialize trend monitor"""

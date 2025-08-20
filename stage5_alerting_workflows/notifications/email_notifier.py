@@ -30,6 +30,11 @@ class EmailNotifier:
         }
         self._initialize_notifier()
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("EmailNotifier initialized successfully")
+        return True
+    
     def _initialize_notifier(self):
         """Initialize email notifier"""
         

@@ -70,6 +70,11 @@ class AlertEngine:
         }
         self._initialize_engine()
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("AlertEngine initialized successfully")
+        return True
+    
     def _initialize_engine(self):
         """Initialize alert engine"""
         

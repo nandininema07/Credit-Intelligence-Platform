@@ -8,12 +8,17 @@ import asyncpg
 import json
 import gzip
 import logging
+import os
 from typing import List, Dict, Any, Optional, Union
 from datetime import datetime, timedelta
 import pandas as pd
 from io import StringIO, BytesIO
 import pickle
 import base64
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -26,20 +31,48 @@ class PostgreSQLManager:
         self.pool = None
         
     def _build_connection_string(self) -> str:
-        """Build PostgreSQL connection string"""
-        host = self.config.get('postgres_host', 'localhost')
-        port = self.config.get('postgres_port', 5432)
-        database = self.config.get('postgres_database', 'credit_intelligence')
-        user = self.config.get('postgres_user', 'postgres')
-        password = self.config.get('postgres_password', '')
+        """Build PostgreSQL connection string from environment variables"""
+        # Ensure .env is loaded
+        load_dotenv()
+        
+        host = os.getenv('DB_HOST', 'localhost')
+        port = os.getenv('DB_PORT', '5432')
+        database = os.getenv('DB_NAME', 'credit_intelligence')
+        user = os.getenv('DB_USER', 'postgres')
+        password = os.getenv('DB_PASSWORD', '')
+        
+        logger.info(f"Building connection string - Host: {host}, Port: {port}, DB: {database}, User: {user}")
         
         return f"postgresql://{user}:{password}@{host}:{port}/{database}"
     
     async def initialize(self):
         """Initialize connection pool and create tables"""
         try:
+            # Test connection first using individual parameters (same as test_db_connection.py)
+            host = os.getenv('DB_HOST', 'localhost')
+            port = int(os.getenv('DB_PORT', '5432'))
+            database = os.getenv('DB_NAME', 'credit_intelligence')
+            user = os.getenv('DB_USER', 'postgres')
+            password = os.getenv('DB_PASSWORD', '')
+            
+            logger.info(f"Testing connection with individual parameters...")
+            test_conn = await asyncpg.connect(
+                host=host,
+                port=port,
+                user=user,
+                password=password,
+                database=database
+            )
+            await test_conn.close()
+            logger.info("✅ Test connection successful!")
+            
+            # Now create pool using individual parameters instead of connection string
             self.pool = await asyncpg.create_pool(
-                self.connection_string,
+                host=host,
+                port=port,
+                user=user,
+                password=password,
+                database=database,
                 min_size=5,
                 max_size=20,
                 command_timeout=60
@@ -53,25 +86,36 @@ class PostgreSQLManager:
             raise
     
     async def _create_tables(self):
-        """Create necessary tables for data storage"""
+        """Create necessary tables for data storage - work with existing schema"""
         async with self.pool.acquire() as conn:
-            # Raw data table
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS raw_data (
-                    id SERIAL PRIMARY KEY,
-                    data_type VARCHAR(100) NOT NULL,
-                    company VARCHAR(200),
-                    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-                    source VARCHAR(200),
-                    language VARCHAR(10),
-                    content JSONB NOT NULL,
-                    metadata JSONB,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                    INDEX (data_type, company, timestamp),
-                    INDEX (timestamp),
-                    INDEX (company)
-                )
+            # Check if raw_data table exists with expected structure
+            existing_raw_data = await conn.fetchval("""
+                SELECT table_name FROM information_schema.tables 
+                WHERE table_name = 'raw_data' AND table_schema = 'public'
             """)
+            
+            if existing_raw_data:
+                logger.info("✅ Raw data table already exists with correct structure")
+            else:
+                # Create raw_data table if it doesn't exist
+                await conn.execute("""
+                    CREATE TABLE IF NOT EXISTS raw_data (
+                        id SERIAL PRIMARY KEY,
+                        data_type VARCHAR(100) NOT NULL,
+                        company VARCHAR(200),
+                        timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
+                        source VARCHAR(200),
+                        language VARCHAR(10),
+                        content JSONB NOT NULL,
+                        metadata JSONB,
+                        created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+                    )
+                """)
+            
+            # Create indexes for raw_data (using existing column names)
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_raw_data_type_company_timestamp ON raw_data (data_type, company, timestamp)")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_raw_data_timestamp ON raw_data (timestamp)")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_raw_data_company ON raw_data (company)")
             
             # Processed data table
             await conn.execute("""
@@ -83,61 +127,53 @@ class PostgreSQLManager:
                     format VARCHAR(50) DEFAULT 'parquet',
                     row_count INTEGER,
                     metadata JSONB,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                    INDEX (data_type, timestamp),
-                    INDEX (timestamp)
+                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                 )
             """)
             
-            # Features table
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS features (
-                    id SERIAL PRIMARY KEY,
-                    company VARCHAR(200) NOT NULL,
-                    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-                    feature_name VARCHAR(200) NOT NULL,
-                    feature_value FLOAT,
-                    feature_metadata JSONB,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                    UNIQUE(company, timestamp, feature_name),
-                    INDEX (company, timestamp),
-                    INDEX (feature_name, timestamp)
-                )
+            # Create indexes for processed_data
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_processed_data_type_timestamp ON processed_data (data_type, timestamp)")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_processed_data_timestamp ON processed_data (timestamp)")
+            
+            # Features table - check if it exists
+            existing_features = await conn.fetchval("""
+                SELECT table_name FROM information_schema.tables 
+                WHERE table_name = 'features' AND table_schema = 'public'
             """)
             
-            # Credit scores table
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS credit_scores (
-                    id SERIAL PRIMARY KEY,
-                    company VARCHAR(200) NOT NULL,
-                    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-                    score FLOAT NOT NULL,
-                    model_version VARCHAR(50),
-                    confidence FLOAT,
-                    explanation JSONB,
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                    INDEX (company, timestamp),
-                    INDEX (timestamp)
-                )
+            if existing_features:
+                logger.info("✅ Features table already exists with correct structure")
+            
+            # Create indexes for features (using existing structure with company_ticker)
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_features_company_timestamp ON features (company_ticker, calculated_at)")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_features_name_timestamp ON features (feature_name, calculated_at)")
+            
+            # Credit scores table - check if it exists
+            existing_scores = await conn.fetchval("""
+                SELECT table_name FROM information_schema.tables 
+                WHERE table_name = 'credit_scores' AND table_schema = 'public'
             """)
             
-            # Alerts table
-            await conn.execute("""
-                CREATE TABLE IF NOT EXISTS alerts (
-                    id SERIAL PRIMARY KEY,
-                    company VARCHAR(200) NOT NULL,
-                    alert_type VARCHAR(100) NOT NULL,
-                    severity VARCHAR(20) NOT NULL,
-                    message TEXT NOT NULL,
-                    timestamp TIMESTAMP WITH TIME ZONE NOT NULL,
-                    metadata JSONB,
-                    status VARCHAR(20) DEFAULT 'active',
-                    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-                    INDEX (company, timestamp),
-                    INDEX (alert_type, timestamp),
-                    INDEX (status)
-                )
+            if existing_scores:
+                logger.info("✅ Credit scores table already exists with correct structure")
+            
+            # Create indexes for credit_scores (using existing structure with company_ticker)
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_credit_scores_company_timestamp ON credit_scores (company_ticker, calculated_at)")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_credit_scores_timestamp ON credit_scores (calculated_at)")
+            
+            # Alerts table - check if it exists
+            existing_alerts = await conn.fetchval("""
+                SELECT table_name FROM information_schema.tables 
+                WHERE table_name = 'alerts' AND table_schema = 'public'
             """)
+            
+            if existing_alerts:
+                logger.info("✅ Alerts table already exists with correct structure")
+            
+            # Create indexes for alerts (using existing structure with company_ticker)
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_alerts_company_timestamp ON alerts (company_ticker, triggered_at)")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_alerts_type_timestamp ON alerts (alert_type, triggered_at)")
+            await conn.execute("CREATE INDEX IF NOT EXISTS idx_alerts_status ON alerts (status)")
     
     async def store_raw_data(self, data: Any, data_type: str, 
                            company: str = None, source: str = None,

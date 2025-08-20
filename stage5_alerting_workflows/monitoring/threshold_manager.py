@@ -59,6 +59,11 @@ class ThresholdManager:
         }
         self._initialize_defaults()
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("ThresholdManager initialized successfully")
+        return True
+    
     def _initialize_defaults(self):
         """Initialize default thresholds"""
         

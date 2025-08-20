@@ -67,6 +67,11 @@ class MetricsCollector:
             'collection_errors': 0
         }
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("MetricsCollector initialized successfully")
+        return True
+    
     async def register_metric(self, name: str, metric_type: MetricType,
                             description: str, unit: str = "") -> bool:
         """Register a new metric"""

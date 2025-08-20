@@ -31,6 +31,11 @@ class ExportManager:
         # Ensure output directory exists
         os.makedirs(self.output_directory, exist_ok=True)
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("ExportManager initialized successfully")
+        return True
+    
     async def export_alerts(self, alerts: List[Dict[str, Any]], 
                           export_format: str = 'json',
                           filename: str = None) -> Optional[str]:

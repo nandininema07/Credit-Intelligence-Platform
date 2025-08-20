@@ -77,7 +77,21 @@ class DataIngestionPipeline:
         self.data_cleaner = DataCleaner(config.get('data_cleaning', {}))
         
         # Initialize storage and monitoring
-        self.storage = PostgreSQLManager(config.get('postgres', {}))
+        # Ensure database config includes environment variables
+        postgres_config = config.get('postgres', {})
+        if not postgres_config:
+            # Load from environment if no config provided
+            from dotenv import load_dotenv
+            import os
+            load_dotenv()
+            postgres_config = {
+                'host': os.getenv('DB_HOST', 'localhost'),
+                'port': int(os.getenv('DB_PORT', '5432')),
+                'database': os.getenv('DB_NAME', 'credit_intelligence'),
+                'user': os.getenv('DB_USER', 'postgres'),
+                'password': os.getenv('DB_PASSWORD', '')
+            }
+        self.storage = PostgreSQLManager(postgres_config)
         self.health_checker = HealthChecker(config.get('health_checks', {}))
         self.metrics = MetricsCollector(config.get('metrics', {}))
         
@@ -632,13 +646,26 @@ class DataIngestionPipeline:
     
     async def get_pipeline_status(self) -> Dict[str, Any]:
         """Get current pipeline status"""
-        return {
-            'running': self.running,
-            'active_tasks': len([t for t in self.pipeline_tasks if not t.done()]),
-            'health_status': await self.health_checker.check_pipeline_health(),
-            'metrics': await self.metrics.get_current_metrics(),
-            'storage_stats': await self.storage.get_data_statistics()
-        }
+        try:
+            # Get storage stats - handle both async and sync methods
+            storage_stats = self.storage.get_data_statistics()
+            if hasattr(storage_stats, '__await__'):
+                storage_stats = await storage_stats
+            
+            return {
+                'running': self.running,
+                'active_tasks': len([t for t in self.pipeline_tasks if not t.done()]),
+                'health_status': await self.health_checker.check_pipeline_health(),
+                'metrics': await self.metrics.get_current_metrics(),
+                'storage_stats': storage_stats,
+                'healthy': True
+            }
+        except Exception as e:
+            return {
+                'running': self.running,
+                'healthy': False,
+                'error': str(e)
+            }
     
     async def cleanup(self):
         """Cleanup pipeline resources"""

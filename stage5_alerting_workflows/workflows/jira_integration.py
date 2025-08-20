@@ -33,6 +33,11 @@ class JiraIntegration:
         # Create auth header
         self.auth_header = self._create_auth_header()
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("JiraIntegration initialized successfully")
+        return True
+    
     def _create_auth_header(self) -> str:
         """Create basic auth header for Jira API"""
         if not self.username or not self.api_token:

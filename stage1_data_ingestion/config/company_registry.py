@@ -94,9 +94,15 @@ class CompanyRegistry:
         ]
         
         for company in default_companies:
-            self.companies[company.id] = company
-            
+            self.add_company(company)
+        
         logger.info(f"Loaded {len(default_companies)} default companies")
+    
+    async def load_companies(self):
+        """Async method to load companies - required by pipeline"""
+        # Companies are already loaded in __init__, this is just for compatibility
+        logger.info(f"Company registry ready with {len(self.companies)} companies")
+        return True
     
     def add_company(self, company: Company) -> bool:
         """Add company to registry"""

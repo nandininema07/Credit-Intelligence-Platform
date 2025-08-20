@@ -59,6 +59,11 @@ class AnomalyDetector:
         }
         self._initialize_detector()
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("AnomalyDetector initialized successfully")
+        return True
+    
     def _initialize_detector(self):
         """Initialize anomaly detector"""
         

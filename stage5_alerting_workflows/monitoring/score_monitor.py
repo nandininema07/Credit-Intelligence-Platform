@@ -52,6 +52,11 @@ class ScoreMonitor:
         }
         self._initialize_monitor()
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("ScoreMonitor initialized successfully")
+        return True
+    
     def _initialize_monitor(self):
         """Initialize score monitor"""
         

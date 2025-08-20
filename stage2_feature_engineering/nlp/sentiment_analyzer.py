@@ -25,6 +25,11 @@ class SentimentAnalyzer:
         self.pipelines = {}
         self.financial_keywords = self._load_financial_keywords()
         self.initialize_models()
+    
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("SentimentAnalyzer initialized successfully")
+        return True
         
     def initialize_models(self):
         """Initialize sentiment analysis models"""

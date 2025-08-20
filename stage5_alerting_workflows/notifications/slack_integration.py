@@ -25,6 +25,11 @@ class SlackIntegration:
             'channels_used': {}
         }
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("SlackIntegration initialized successfully")
+        return True
+    
     async def send_alert_notification(self, alert_data: Dict[str, Any], 
                                     channels: List[str] = None) -> bool:
         """Send alert notification to Slack"""

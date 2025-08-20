@@ -24,6 +24,11 @@ class SMSNotifier:
         }
         self._initialize_providers()
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("SMSNotifier initialized successfully")
+        return True
+    
     def _initialize_providers(self):
         """Initialize SMS providers"""
         

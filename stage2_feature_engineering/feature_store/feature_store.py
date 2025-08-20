@@ -27,6 +27,43 @@ class FeatureStore:
     def ensure_storage_directory(self):
         """Ensure storage directory exists"""
         os.makedirs(self.storage_path, exist_ok=True)
+    
+    async def initialize(self):
+        """Initialize the feature store"""
+        self.ensure_storage_directory()
+        logger.info(f"Feature store initialized with storage path: {self.storage_path}")
+        return True
+    
+    async def close(self):
+        """Close the feature store and cleanup resources"""
+        logger.info("Feature store closed successfully")
+        return True
+    
+    async def is_connected(self):
+        """Check if feature store is connected/available"""
+        try:
+            # Check if storage directory exists and is accessible
+            return os.path.exists(self.storage_path) and os.access(self.storage_path, os.W_OK)
+        except Exception:
+            return False
+    
+    def get_company_count(self):
+        """Get count of companies with stored features"""
+        try:
+            if not os.path.exists(self.storage_path):
+                return 0
+            
+            # Count unique companies from stored feature files
+            companies = set()
+            for filename in os.listdir(self.storage_path):
+                if filename.endswith('.json'):
+                    # Extract company from filename pattern: company_timestamp.json
+                    company = filename.split('_')[0]
+                    companies.add(company)
+            
+            return len(companies)
+        except Exception:
+            return 0
         
     async def store_features(self, company: str, features: Dict[str, float], 
                            timestamp: datetime = None) -> str:

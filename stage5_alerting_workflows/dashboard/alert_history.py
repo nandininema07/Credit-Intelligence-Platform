@@ -75,6 +75,11 @@ class AlertHistory:
             'resolution_times': []
         }
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("AlertHistory initialized successfully")
+        return True
+    
     async def add_alert(self, alert_data: Dict[str, Any]) -> bool:
         """Add alert to history"""
         

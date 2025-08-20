@@ -26,6 +26,11 @@ class WebhookNotifier:
         }
         self._initialize_webhooks()
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("WebhookNotifier initialized successfully")
+        return True
+    
     def _initialize_webhooks(self):
         """Initialize webhook configurations"""
         

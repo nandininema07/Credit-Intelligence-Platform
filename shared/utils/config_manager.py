@@ -7,6 +7,10 @@ import os
 import yaml
 from typing import Dict, Any, Optional
 import logging
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 logger = logging.getLogger(__name__)
 
@@ -70,12 +74,13 @@ class ConfigManager:
     
     def get_database_config(self) -> Dict[str, Any]:
         """Get database configuration"""
+        # Load from environment variables first, then config file, then defaults
         return self.config_data.get('database', {
-            'host': 'localhost',
-            'port': 5432,
-            'database': 'credit_intelligence',
-            'user': 'postgres',
-            'password': '@nandiniPOSTGRES23'
+            'host': os.getenv('DB_HOST', 'localhost'),
+            'port': int(os.getenv('DB_PORT', '5432')),
+            'database': os.getenv('DB_NAME', 'credit_intelligence'),
+            'user': os.getenv('DB_USER', 'postgres'),
+            'password': os.getenv('DB_PASSWORD', '')
         })
     
     def get_api_key(self, service: str) -> Optional[str]:

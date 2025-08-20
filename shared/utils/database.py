@@ -3,10 +3,16 @@ Shared database utilities for the Credit Intelligence Platform.
 Provides common database operations and connection management.
 """
 
-import asyncio
-import logging
-from typing import Dict, List, Any, Optional, Union
 import asyncpg
+import logging
+import os
+from typing import Dict, Any, Optional
+import json
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
+
 import pandas as pd
 from datetime import datetime
 import json
@@ -22,12 +28,12 @@ class DatabaseManager:
         self.connection_string = self._build_connection_string()
         
     def _build_connection_string(self) -> str:
-        """Build PostgreSQL connection string"""
-        host = self.config.get('postgres_host', 'localhost')
-        port = self.config.get('postgres_port', 5432)
-        database = self.config.get('postgres_database', 'credit_intelligence')
-        user = self.config.get('postgres_user', 'postgres')
-        password = self.config.get('postgres_password', '')
+        """Build PostgreSQL connection string from environment variables"""
+        host = os.getenv('DB_HOST', 'localhost')
+        port = os.getenv('DB_PORT', '5432')
+        database = os.getenv('DB_NAME', 'credit_intelligence')
+        user = os.getenv('DB_USER', 'postgres')
+        password = os.getenv('DB_PASSWORD', '')
         
         return f"postgresql://{user}:{password}@{host}:{port}/{database}"
     

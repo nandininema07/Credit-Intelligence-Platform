@@ -36,6 +36,11 @@ class TextEmbeddings:
         self.tokenizers = {}
         self.device = torch.device('cuda' if torch and torch.cuda.is_available() else 'cpu') if torch else None
         self.initialize_models()
+    
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("TextEmbeddings initialized successfully")
+        return True
         
     def initialize_models(self):
         """Initialize embedding models"""

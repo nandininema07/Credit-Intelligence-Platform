@@ -61,6 +61,11 @@ class LiveFeed:
             'active_subscribers': 0
         }
     
+    async def initialize(self):
+        """Async initialize method required by pipeline"""
+        logger.info("LiveFeed initialized successfully")
+        return True
+    
     async def add_event(self, event_type: FeedEventType, company_id: str,
                        title: str, description: str, severity: str = 'medium',
                        data: Dict[str, Any] = None, source: str = 'system') -> str:
