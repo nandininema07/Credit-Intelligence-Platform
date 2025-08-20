@@ -33,11 +33,24 @@ seaborn
 
 # NLP
 spacy
+transformers
+sentence-transformers
 textblob
+langdetect
 nltk
 vaderSentiment
 fuzzywuzzy
 python-Levenshtein
+seaborn
+
+# Data Collection APIs
+newsapi-python
+tweepy
+praw
+yfinance
+feedparser
+aiohttp
+beautifulsoup4
 
 # Explainability
 shap

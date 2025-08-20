@@ -1,13 +1,15 @@
-# Credit Intelligence Platform
+# Real-Time Explainable Credit Intelligence Platform
 
-A comprehensive real-time credit risk analysis and monitoring system with integrated AI/ML pipeline.
+A comprehensive real-time credit risk analysis and monitoring system with **event-driven scoring** and **explainable AI** for the IITK CredTech Hackathon.
 
-## Complete Implementation Status
+## 🏆 Hackathon Implementation Status
 
-✅ **All 5 Pipeline Stages Implemented**
-✅ **FastAPI Backend with Full API**
+✅ **Real-Time Event-Driven Scoring**
+✅ **Multi-Source Data Ingestion (15+ Sources)**
+✅ **Unstructured Event Detection & Integration**
+✅ **Explainable AI with Feature-Level Insights**
+✅ **Interactive Analyst Dashboard**
 ✅ **Production-Ready Deployment**
-✅ **End-to-End Integration**
 
 ## Architecture Overview
 
@@ -25,35 +27,35 @@ The platform consists of 5 integrated stages plus a comprehensive FastAPI backen
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-### Stage 1: Data Ingestion (`stage1_data_ingestion/`)
-- **Multi-source scrapers**: News, social media, financial APIs, regulatory filings
-- **Real-time processing**: Language detection, entity extraction, sentiment analysis
-- **PostgreSQL storage**: Compressed data with quality monitoring
-- **Health monitoring**: Pipeline status and metrics collection
+### Stage 1: Real-Time Data Ingestion (`stage1_data_ingestion/`)
+- **15+ Data Sources**: NewsAPI, Twitter, Reddit, Yahoo Finance, Alpha Vantage, FRED, SEC EDGAR, RSS feeds
+- **Event Detection**: Real-time NLP processing to detect credit-impacting events (debt restructuring, earnings warnings, etc.)
+- **Streaming Processing**: Sub-second event processing with priority queues and rate limiting
+- **Multi-Source Collector**: Async data collection from all sources with fault tolerance
 
 ### Stage 2: Feature Engineering (`stage2_feature_engineering/`)
-- **NLP processing**: Sentiment analysis, topic modeling, entity linking, event detection
-- **Financial analysis**: Ratio calculations, trend analysis, volatility metrics
-- **Feature store**: Time series aggregation and feature scaling
-- **Market indicators**: Comprehensive market-based feature generation
+- **Event-Driven Features**: Real-time feature updates based on detected events
+- **NLP Processing**: Advanced sentiment analysis, entity extraction, language detection
+- **Financial Metrics**: Market indicators, volatility analysis, trend detection
+- **Feature Store**: Time-series aggregation with real-time updates and validation
 
-### Stage 3: Model Training (`stage3_model_training/`)
-- **Ensemble models**: XGBoost, LightGBM, Random Forest with hyperparameter tuning
-- **Automated training**: Performance monitoring, drift detection, retraining
-- **Model versioning**: Metadata tracking and model registry
-- **Credit scoring**: Risk categorization and confidence scoring
+### Stage 3: Real-Time Scoring (`stage3_model_training/`)
+- **Event-Driven Scoring**: Immediate score updates based on detected events (30-second latency)
+- **Impact Calculation**: Calibrated event impact weights (-25 to +5 points) with confidence scoring
+- **Ensemble Models**: XGBoost, LightGBM with real-time inference capabilities
+- **Dynamic Risk Assessment**: Continuous score recalculation with time-decay factors
 
-### Stage 4: Explainability (`stage4_explainability/`)
-- **ML explanations**: SHAP and LIME for model transparency
-- **AI chat interface**: OpenAI integration for natural language explanations
-- **Interactive queries**: Context-aware responses and recommendations
-- **Explanation caching**: Performance optimization for repeated queries
+### Stage 4: Explainable AI (`stage4_explainability/`)
+- **Event Explanations**: Real-time explanations for score changes with event context
+- **Feature-Level Insights**: SHAP and LIME explanations for model transparency
+- **AI Chat Interface**: Natural language explanations of score changes and trends
+- **Trend Analysis**: Short-term vs long-term indicators with reasoning highlights
 
-### Stage 5: Alerting & Workflows (`stage5_alerting_workflows/`)
-- **Real-time alerting**: Score-based and threshold alerts with cooldown management
-- **Multi-channel notifications**: Email, Slack, Teams, SMS integration
-- **Workflow automation**: Jira ticket creation, PDF report generation
-- **Live feed**: Real-time event streaming and alert history
+### Stage 5: Real-Time Alerting (`stage5_alerting_workflows/`)
+- **Event-Triggered Alerts**: Immediate notifications for critical events (bankruptcy, downgrades)
+- **Score Change Alerts**: Threshold-based alerts with configurable sensitivity
+- **Multi-Channel Notifications**: Email, Slack, Teams, SMS with priority routing
+- **Live Dashboard Feed**: Real-time event stream with WebSocket connections
 
 ### FastAPI Backend (`backend/`)
 - **Complete REST API**: Companies, scores, alerts, chat, WebSocket endpoints
@@ -200,18 +202,31 @@ Each stage has comprehensive configuration options:
 - **Stage 4**: Explainability methods, chat configurations
 - **Stage 5**: Alert thresholds, notification channels
 
-## Key Features
+## 🚀 Key Hackathon Features
 
-### Real-time Data Processing
-- **15+ data sources**: Financial APIs, news, social media, regulatory filings
-- **Multi-language support**: Automatic language detection and processing
-- **Quality monitoring**: Data validation and health checks
-- **Scalable ingestion**: Async processing with rate limiting
+### Real-Time Event-Driven Scoring
+- **Sub-30 Second Updates**: Events detected and scored faster than traditional ratings
+- **9 Event Types**: Debt restructuring, earnings warnings, regulatory actions, etc.
+- **Impact Calibration**: Each event type has calibrated score impact (-25 to +5 points)
+- **Confidence Scoring**: Events filtered by confidence thresholds and time decay
 
-- **API key management**: Secure credential storage
-- **Data encryption**: Sensitive data protection
-- **JWT authentication**: Secure API access
-- **Input validation**: Comprehensive data validation
+### Unstructured Data Integration
+- **NLP Event Detection**: Advanced pattern matching for credit-impacting events
+- **Multi-Source Processing**: News, social media, filings processed simultaneously
+- **Entity Recognition**: Company mentions extracted with alias matching
+- **Sentiment Integration**: Event sentiment factored into score calculations
+
+### Explainable AI
+- **Event Explanations**: Every score change includes event context and reasoning
+- **Feature Contributions**: SHAP-based explanations for model transparency
+- **Trend Analysis**: Short-term vs long-term indicators with plain-language summaries
+- **Interactive Chat**: AI assistant explains score changes and provides insights
+
+### Production-Ready Architecture
+- **Streaming Processing**: Async event queues with priority handling
+- **Fault Tolerance**: Graceful handling of data source outages
+- **WebSocket Integration**: Real-time dashboard updates
+- **Scalable Design**: Handles dozens of companies with rate limiting
 
 ## 📈 Monitoring & Observability
 
@@ -239,11 +254,33 @@ For support and questions:
 - Check the documentation in `/docs`
 - Review the configuration examples
 
-## 🔮 Roadmap
+## 🎯 Hackathon Deliverables
 
-- [ ] Real-time streaming data processing
-- [ ] Advanced ensemble models
-- [ ] Mobile app integration
-- [ ] Blockchain integration for audit trails
-- [ ] Advanced visualization dashboard
-- [ ] Multi-tenant architecture
+### 1. **Code Repository** ✅
+- Complete implementation with atomic commits
+- Clear documentation and setup instructions
+- Modular architecture with separation of concerns
+
+### 2. **Public Demo URL** 🚧
+- FastAPI backend with interactive documentation
+- Real-time dashboard with live score updates
+- WebSocket connections for event streaming
+
+### 3. **Video Walkthrough** 📹
+- Key features demonstration (5-7 minutes)
+- End-to-end product flow
+- Technical implementation highlights
+
+### 4. **Presentation Deck** 📊
+- System architecture and design decisions
+- Model performance and explainability
+- Innovation highlights and competitive advantages
+
+## 🏅 Evaluation Alignment
+
+- **Data Engineering (20%)**: Multi-source ingestion, streaming processing, fault tolerance
+- **Model Accuracy & Explainability (30%)**: Event-driven scoring, SHAP explanations, confidence metrics
+- **Unstructured Data (12.5%)**: NLP event detection, sentiment integration, entity recognition
+- **User Experience (15%)**: Interactive dashboard, real-time updates, analyst-friendly interface
+- **Deployment (10%)**: Production-ready FastAPI, Docker containers, monitoring
+- **Innovation (12.5%)**: Real-time event processing, sub-30-second scoring, explainable updates

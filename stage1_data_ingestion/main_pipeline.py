@@ -21,6 +21,7 @@ from .data_processing.text_processor import TextProcessor
 from .data_processing.language_detector import LanguageDetector
 from .data_processing.entity_extractor import EntityExtractor
 from .data_processing.data_cleaner import DataCleaner
+from .data_processing.multi_source_collector import MultiSourceDataCollector
 
 from .storage.postgres_manager import PostgreSQLManager
 from .config.company_registry import CompanyRegistry
@@ -36,7 +37,32 @@ class DataIngestionPipeline:
         self.config = config
         self.company_registry = CompanyRegistry(config.get('company_registry', {}))
         
-        # Initialize scrapers
+        # Initialize multi-source data collector
+        try:
+            from .data_processing.multi_source_collector import MultiSourceDataCollector
+            self.multi_source_collector = MultiSourceDataCollector(self.config)
+            logger.info("Multi-source data collector initialized")
+        except ImportError as e:
+            logger.warning(f"Multi-source collector not available: {e}")
+            self.multi_source_collector = None
+        
+        # Initialize real-time processing components
+        try:
+            from .streaming.real_time_processor import RealTimeProcessor, StreamingDataIntegrator
+            from .event_processing.real_time_event_detector import RealTimeEventDetector
+            
+            self.real_time_processor = RealTimeProcessor(self.config)
+            self.streaming_integrator = StreamingDataIntegrator(self.real_time_processor)
+            self.event_detector = RealTimeEventDetector(self.config)
+            
+            logger.info("Real-time processing components initialized")
+        except ImportError as e:
+            logger.warning(f"Real-time processing not available: {e}")
+            self.real_time_processor = None
+            self.streaming_integrator = None
+            self.event_detector = None
+        
+        # Initialize scrapers (legacy)
         self.news_scrapers = NewsScrapers(config.get('news_scrapers', {}))
         self.social_scrapers = SocialScrapers(config.get('social_scrapers', {}))
         self.financial_scrapers = FinancialScrapers(config.get('financial_scrapers', {}))
@@ -82,16 +108,10 @@ class DataIngestionPipeline:
         self.running = True
         logger.info("Starting data ingestion pipeline")
         
-        # Start different pipeline components
+        # Start enhanced multi-source ingestion loop
         self.pipeline_tasks = [
-            asyncio.create_task(self._news_ingestion_loop()),
-            asyncio.create_task(self._social_ingestion_loop()),
-            asyncio.create_task(self._financial_ingestion_loop()),
-            asyncio.create_task(self._regulatory_ingestion_loop()),
-            asyncio.create_task(self._international_ingestion_loop()),
-            asyncio.create_task(self._alternative_ingestion_loop()),
-            asyncio.create_task(self._health_monitoring_loop()),
-            asyncio.create_task(self._metrics_collection_loop())
+            asyncio.create_task(self._multi_source_ingestion_loop()),
+            asyncio.create_task(self._health_monitoring_loop())
         ]
         
         try:
@@ -117,8 +137,99 @@ class DataIngestionPipeline:
         self.pipeline_tasks = []
         logger.info("Data ingestion pipeline stopped")
     
+    async def _multi_source_ingestion_loop(self):
+        """Enhanced multi-source data ingestion using all APIs"""
+        interval = self.config.get('collection_interval', 300)  # 5 minutes
+        
+        while self.running:
+            try:
+                logger.info("Starting multi-source data collection cycle...")
+                
+                # Collect data from all sources
+                data_points = await self.multi_source_collector.collect_all_data()
+                
+                if data_points:
+                    # Process collected data
+                    processed_data = await self._process_data_points(data_points)
+                    
+                    # Store processed data
+                    await self._store_data_points(processed_data)
+                    
+                    # Log collection statistics
+                    stats = self.multi_source_collector.get_collection_stats(data_points)
+                    logger.info(f"Collection cycle completed: {stats}")
+                    
+                    # Update metrics
+                    await self.metrics.record_ingestion_cycle(len(data_points), stats)
+                
+                await asyncio.sleep(interval)
+                
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error in multi-source ingestion loop: {e}")
+                await asyncio.sleep(60)  # Wait before retrying
+    
+    async def _process_data_points(self, data_points: List) -> List:
+        """Process collected data points through cleaning and enrichment"""
+        processed_data = []
+        
+        for data_point in data_points:
+            try:
+                # Clean and process text content
+                if hasattr(data_point, 'content') and data_point.content:
+                    cleaned_content = await self.data_cleaner.clean_text(data_point.content)
+                    data_point.content = cleaned_content
+                
+                # Detect language if not already set
+                if not data_point.language and data_point.content:
+                    data_point.language = await self.language_detector.detect_language(data_point.content)
+                
+                # Extract entities
+                if data_point.content:
+                    entities = await self.entity_extractor.extract_entities(data_point.content)
+                    if not hasattr(data_point, 'metadata'):
+                        data_point.metadata = {}
+                    data_point.metadata['entities'] = entities
+                
+                processed_data.append(data_point)
+                
+            except Exception as e:
+                logger.error(f"Error processing data point: {e}")
+                # Still include the data point even if processing fails
+                processed_data.append(data_point)
+        
+        return processed_data
+    
+    async def _store_data_points(self, data_points: List) -> bool:
+        """Store processed data points to database"""
+        try:
+            # Convert data points to storage format
+            storage_records = []
+            for dp in data_points:
+                if hasattr(dp, 'to_dict'):
+                    record = dp.to_dict()
+                else:
+                    record = dp.__dict__ if hasattr(dp, '__dict__') else {}
+                
+                storage_records.append(record)
+            
+            # Store to database
+            success = await self.storage.bulk_insert('raw_data', storage_records)
+            
+            if success:
+                logger.info(f"Successfully stored {len(data_points)} data points")
+            else:
+                logger.error(f"Failed to store {len(data_points)} data points")
+            
+            return success
+            
+        except Exception as e:
+            logger.error(f"Error storing data points: {e}")
+            return False
+    
     async def _news_ingestion_loop(self):
-        """Continuous news data ingestion"""
+        """Legacy news data ingestion (kept for compatibility)"""
         interval = self.config.get('news_interval', 300)  # 5 minutes
         
         while self.running:

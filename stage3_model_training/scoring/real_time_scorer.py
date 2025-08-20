@@ -1,6 +1,6 @@
 """
-Real-time credit risk scoring engine.
-Provides fast, low-latency scoring for credit risk assessment.
+Real-time credit risk scoring engine with event-driven updates.
+Provides fast, low-latency scoring for credit risk assessment and real-time event impact calculation.
 """
 
 import asyncio
@@ -8,7 +8,7 @@ import logging
 from typing import Dict, List, Any, Optional
 import pandas as pd
 import numpy as np
-from datetime import datetime
+from datetime import datetime, timedelta
 import joblib
 from dataclasses import dataclass
 import json
@@ -48,34 +48,53 @@ class RealTimeScorer:
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         self.models = {}
-        self.scalers = {}
-        self.feature_names = []
-        self.is_loaded = False
+        self.feature_processors = {}
+        self.score_cache = {}
+        self.cache_ttl = config.get('cache_ttl_seconds', 300)  # 5 minutes default
         
-    async def load_models(self, model_path: str = './models/'):
-        """Load trained models for scoring"""
-        import os
+        # Event impact weights for different event types
+        self.event_impact_weights = {
+            'debt_restructuring': -0.8,
+            'earnings_warning': -0.6,
+            'credit_downgrade': -0.9,
+            'regulatory_action': -0.7,
+            'bankruptcy_filing': -1.0,
+            'liquidity_crisis': -0.8,
+            'positive_earnings': 0.4,
+            'new_contract': 0.3,
+            'expansion_news': 0.2
+        }
         
-        model_files = [f for f in os.listdir(model_path) if f.endswith('.pkl') and not f.endswith('_scaler.pkl')]
-        
-        for model_file in model_files:
-            model_name = model_file.replace('.pkl', '')
-            model_filepath = os.path.join(model_path, model_file)
+        # Load models and processors
+        asyncio.create_task(self._load_models())
+    
+    async def _load_models(self):
+        """Load pre-trained models and feature processors"""
+        try:
+            model_path = self.config.get('model_path', 'models/')
             
-            try:
-                model = joblib.load(model_filepath)
-                self.models[model_name] = model
-                
-                # Load scaler if exists
-                scaler_file = os.path.join(model_path, f"{model_name}_scaler.pkl")
-                if os.path.exists(scaler_file):
-                    scaler = joblib.load(scaler_file)
-                    self.scalers[model_name] = scaler
-                
-                logger.info(f"Loaded model: {model_name}")
-                
-            except Exception as e:
-                logger.error(f"Error loading model {model_name}: {str(e)}")
+            # Load different model types
+            self.models['xgboost'] = joblib.load(f"{model_path}/xgboost_model.joblib")
+            self.models['ensemble'] = joblib.load(f"{model_path}/ensemble_model.joblib")
+            
+            # Load feature processors
+            self.feature_processors['scaler'] = joblib.load(f"{model_path}/feature_scaler.joblib")
+            self.feature_processors['selector'] = joblib.load(f"{model_path}/feature_selector.joblib")
+            
+            logger.info("Models and processors loaded successfully")
+            
+        except Exception as e:
+            logger.error(f"Error loading models: {e}")
+            # Use dummy models for development
+            self._load_dummy_models()
+    
+    def _load_dummy_models(self):
+        # Load dummy models for development
+        self.models['xgboost'] = None
+        self.models['ensemble'] = None
+        self.feature_processors['scaler'] = None
+        self.feature_processors['selector'] = None
+        logger.warning("Using dummy models for development")
         
         if self.models:
             self.is_loaded = True
@@ -225,6 +244,41 @@ class RealTimeScorer:
         
         logger.info(f"Scored {len(results)} companies")
         return results
+    
+    async def calculate_event_impact(self, company_ticker: str, event_data: Any) -> float:
+        """Calculate the impact of a detected event on credit score"""
+        try:
+            event_type = getattr(event_data, 'event_type', None)
+            if not event_type:
+                return 0.0
+            
+            # Get base impact weight
+            base_impact = self.event_impact_weights.get(event_type.value, 0.0)
+            
+            # Adjust by confidence and severity
+            confidence = getattr(event_data, 'confidence_score', 0.5)
+            severity_multiplier = {
+                'critical': 1.0,
+                'high': 0.8,
+                'medium': 0.6,
+                'low': 0.4
+            }.get(getattr(event_data, 'severity', 'medium').value, 0.6)
+            
+            # Calculate final impact
+            impact = base_impact * confidence * severity_multiplier * 10.0  # Scale to score points
+            
+            # Apply time decay (recent events have more impact)
+            event_age = datetime.now() - getattr(event_data, 'published_at', datetime.now())
+            decay_factor = max(0.1, 1.0 - (event_age.days / 7.0))  # 7-day decay
+            
+            final_impact = impact * decay_factor
+            
+            logger.info(f"Event impact for {company_ticker}: {final_impact:.2f} points")
+            return final_impact
+            
+        except Exception as e:
+            logger.error(f"Error calculating event impact: {e}")
+            return 0.0
     
     def get_model_info(self) -> Dict[str, Any]:
         """Get information about loaded models"""
