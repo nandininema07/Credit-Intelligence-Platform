@@ -1,69 +1,76 @@
 # Real-Time Explainable Credit Intelligence Platform
 
-A comprehensive real-time credit risk analysis and monitoring system with **event-driven scoring** and **explainable AI** for the IITK CredTech Hackathon.
+[![Python](https://img.shields.io/badge/Python-3.11%2B-blue)](https://www.python.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100%2B-009688)](https://fastapi.tiangolo.com/)
+[![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
 
-## 🏆 Hackathon Implementation Status
+A comprehensive real-time credit risk analysis and monitoring system featuring **event-driven scoring**, **unstructured data integration**, and **Explainable AI (XAI)**. This platform ingests data from over 15 sources to provide immediate, transparent credit intelligence.
 
-✅ **Real-Time Event-Driven Scoring**
-✅ **Multi-Source Data Ingestion (15+ Sources)**
-✅ **Unstructured Event Detection & Integration**
-✅ **Explainable AI with Feature-Level Insights**
-✅ **Interactive Analyst Dashboard**
-✅ **Production-Ready Deployment**
+## 📖 Overview
 
-## Architecture Overview
+Traditional credit scoring is often static and opaque. This platform bridges the gap by utilizing real-time data streams—from financial news to regulatory filings—to dynamically adjust credit scores. It empowers analysts with transparent, AI-driven explanations for every score change, ensuring that risk assessments are both timely and understandable.
+
+## 🚀 Key Features
+
+* **Real-Time Event-Driven Scoring**: Updates credit scores in sub-30 seconds based on detected events (e.g., debt restructuring, earnings warnings).
+* **Multi-Source Data Ingestion**: Aggregates data from 15+ sources including NewsAPI, Twitter, Reddit, SEC EDGAR, and market feeds.
+* **Unstructured Data Processing**: Uses NLP for entity recognition, sentiment analysis, and event detection on unstructured text.
+* **Explainable AI (XAI)**: Provides feature-level insights (SHAP/LIME) and natural language explanations for every score fluctuation.
+* **Interactive Analyst Dashboard**: A full-featured frontend for monitoring scores, viewing alerts, and querying the AI assistant.
+* **Production-Ready Deployment**: Built on FastAPI with WebSocket support, fully containerized with Docker.
+
+## 🏗️ Architecture Overview
 
 The platform consists of 5 integrated stages plus a comprehensive FastAPI backend:
 
+```mermaid
+graph TD
+    A[Stage 1: Data Ingestion] -->|Raw Stream| B[Stage 2: Feature Engineering]
+    B -->|Feature Vectors| C[Stage 3: ML Scoring]
+    C -->|Score & Impact| D[Stage 4: Explainability]
+    D -->|Contextualized Data| E[Stage 5: Alerting]
+    E -->|Notifications| F[FastAPI Backend]
+    F <-->|WebSockets| G[Analyst Dashboard]
+
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Credit Intelligence Platform                  │
-├─────────────────────────────────────────────────────────────────┤
-│  Stage 1: Data Ingestion → Stage 2: Feature Engineering        │
-│                                    ↓                            │
-│  Stage 5: Alerting ← Stage 4: Explainability ← Stage 3: ML     │
-│                                    ↓                            │
-│              FastAPI Backend + Frontend Integration             │
-└─────────────────────────────────────────────────────────────────┘
-```
+### Module Breakdown
 
-### Stage 1: Real-Time Data Ingestion (`stage1_data_ingestion/`)
-- **15+ Data Sources**: NewsAPI, Twitter, Reddit, Yahoo Finance, Alpha Vantage, FRED, SEC EDGAR, RSS feeds
-- **Event Detection**: Real-time NLP processing to detect credit-impacting events (debt restructuring, earnings warnings, etc.)
-- **Streaming Processing**: Sub-second event processing with priority queues and rate limiting
-- **Multi-Source Collector**: Async data collection from all sources with fault tolerance
+#### Stage 1: Real-Time Data Ingestion (`stage1_data_ingestion/`)
+- **15+ Data Sources**: NewsAPI, Twitter, Reddit, Yahoo Finance, Alpha Vantage, FRED, SEC EDGAR, RSS feeds.
+- **Event Detection**: Real-time NLP processing to detect credit-impacting events.
+- **Streaming Processing**: Sub-second event processing with priority queues and rate limiting.
 
-### Stage 2: Feature Engineering (`stage2_feature_engineering/`)
-- **Event-Driven Features**: Real-time feature updates based on detected events
-- **NLP Processing**: Advanced sentiment analysis, entity extraction, language detection
-- **Financial Metrics**: Market indicators, volatility analysis, trend detection
-- **Feature Store**: Time-series aggregation with real-time updates and validation
+#### Stage 2: Feature Engineering (`stage2_feature_engineering/`)
+- **Event-Driven Features**: Real-time feature updates based on detected events.
+- **NLP Processing**: Advanced sentiment analysis, entity extraction, language detection.
+- **Feature Store**: Time-series aggregation with real-time updates and validation.
 
-### Stage 3: Real-Time Scoring (`stage3_model_training/`)
-- **Event-Driven Scoring**: Immediate score updates based on detected events (30-second latency)
-- **Impact Calculation**: Calibrated event impact weights (-25 to +5 points) with confidence scoring
-- **Ensemble Models**: XGBoost, LightGBM with real-time inference capabilities
-- **Dynamic Risk Assessment**: Continuous score recalculation with time-decay factors
+#### Stage 3: Real-Time Scoring (`stage3_model_training/`)
+- **Event-Driven Scoring**: Immediate score updates based on detected events (30-second latency).
+- **Impact Calculation**: Calibrated event impact weights (-25 to +5 points) with confidence scoring.
+- **Ensemble Models**: XGBoost and LightGBM with real-time inference capabilities.
 
-### Stage 4: Explainable AI (`stage4_explainability/`)
-- **Event Explanations**: Real-time explanations for score changes with event context
-- **Feature-Level Insights**: SHAP and LIME explanations for model transparency
-- **AI Chat Interface**: Natural language explanations of score changes and trends
-- **Trend Analysis**: Short-term vs long-term indicators with reasoning highlights
+#### Stage 4: Explainable AI (`stage4_explainability/`)
+- **Event Explanations**: Real-time explanations for score changes with event context.
+- **Feature-Level Insights**: SHAP and LIME explanations for model transparency.
+- **AI Chat Interface**: Natural language explanations of score changes and trends.
 
-### Stage 5: Real-Time Alerting (`stage5_alerting_workflows/`)
-- **Event-Triggered Alerts**: Immediate notifications for critical events (bankruptcy, downgrades)
-- **Score Change Alerts**: Threshold-based alerts with configurable sensitivity
-- **Multi-Channel Notifications**: Email, Slack, Teams, SMS with priority routing
-- **Live Dashboard Feed**: Real-time event stream with WebSocket connections
+#### Stage 5: Real-Time Alerting (`stage5_alerting_workflows/`)
+- **Event-Triggered Alerts**: Immediate notifications for critical events (bankruptcy, downgrades).
+- **Multi-Channel Notifications**: Email, Slack, Teams, SMS with priority routing.
+- **Live Dashboard Feed**: Real-time event stream via WebSockets.
 
-### FastAPI Backend (`backend/`)
-- **Complete REST API**: Companies, scores, alerts, chat, WebSocket endpoints
-- **Authentication**: JWT-based with role-based access control
-- **Real-time features**: WebSocket connections for live updates
-- **Production ready**: Docker, monitoring, security, documentation
+## 🛠️ Tech Stack
 
-## Quick Start
+- **Language**: Python 3.11+
+- **API Framework**: FastAPI
+- **Database**: PostgreSQL 15+ (AsyncPG)
+- **Caching/Queuing**: Redis 7+
+- **ML/AI**: Scikit-learn, XGBoost, SHAP, OpenAI API
+- **Containerization**: Docker, Docker Compose
+
+## ⚡ Quick Start
 
 ### Prerequisites
 - Python 3.11+
@@ -71,14 +78,14 @@ The platform consists of 5 integrated stages plus a comprehensive FastAPI backen
 - Redis 7+
 - Docker & Docker Compose (optional)
 
-### 1. Complete Pipeline Setup
+### 1. Installation
 
 ```bash
-# Clone and setup
-git clone <repository-url>
-cd Credit-Intelligence-Platform
+# Clone the repository
+git clone [https://github.com/yourusername/credit-intelligence-platform.git](https://github.com/yourusername/credit-intelligence-platform.git)
+cd credit-intelligence-platform
 
-# Install all dependencies
+# Install dependencies
 pip install -r requirements.txt
 
 # Configure environment
@@ -89,7 +96,7 @@ cp .env.example .env
 createdb credit_intelligence
 ```
 
-### 2. Run Complete Pipeline
+### 2. Run Pipeline
 
 ```bash
 # Run all 5 stages integrated
@@ -103,74 +110,43 @@ python run_pipeline.py --mode status
 ```
 
 ### 3. Run FastAPI Backend
-
 ```bash
 # Start backend API server
 cd backend
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
-
-# Access API documentation
-# http://localhost:8000/docs
 ```
+Access API documentation at: http://localhost:8000/docs
 
 ### 4. Docker Deployment
-
 ```bash
 # Complete system deployment
 docker-compose up -d
-
-# Backend only
-cd backend
-docker-compose up -d
 ```
 
-## API Endpoints
+## 🔌 API Endpoints
 
-### Companies Management
-- `GET /api/v1/companies` - List companies with advanced filtering
-- `GET /api/v1/companies/{id}` - Get detailed company information
-- `GET /api/v1/companies/search` - Search companies by name/ticker
-- `POST /api/v1/companies` - Create new company
-- `PUT /api/v1/companies/{id}` - Update company information
-- `GET /api/v1/companies/{id}/peers` - Get peer companies
-- `GET /api/v1/companies/{id}/risk-factors` - Get risk factor analysis
-
-### Credit Scoring
-- `GET /api/v1/scores/company/{id}/current` - Current credit score
-- `GET /api/v1/scores/company/{id}/history` - Historical score data
-- `GET /api/v1/scores/company/{id}/prediction` - ML-powered predictions
-- `GET /api/v1/scores/company/{id}/explanation` - AI explanations
-- `GET /api/v1/scores/company/{id}/comparison` - Peer comparisons
-- `GET /api/v1/scores/benchmarks` - Industry benchmarks
-- `GET /api/v1/scores/top-movers` - Biggest score changes
+### Companies & Scoring
+- `GET /api/v1/companies`: List companies with advanced filtering.
+- `GET /api/v1/companies/{id}`: Get detailed company information.
+- `GET /api/v1/scores/company/{id}/current`: Current credit score.
+- `GET /api/v1/scores/company/{id}/explanation`: AI explanations.
 
 ### Alert Management
-- `GET /api/v1/alerts` - List alerts with filtering
-- `GET /api/v1/alerts/feed` - Real-time alert feed
-- `GET /api/v1/alerts/summary` - Alert summary and metrics
-- `POST /api/v1/alerts/{id}/acknowledge` - Acknowledge alert
-- `POST /api/v1/alerts/{id}/resolve` - Resolve alert with notes
-- `POST /api/v1/alerts/{id}/share` - Share/export alert
-- `POST /api/v1/alerts/{id}/create-task` - Create workflow task
+- `GET /api/v1/alerts/feed`: Real-time alert feed.
+- `POST /api/v1/alerts/{id}/acknowledge`: Acknowledge alert.
+- `POST /api/v1/alerts/{id}/resolve`: Resolve alert with notes.
 
 ### AI Chat Assistant
-- `POST /api/v1/chat/message` - Send message to AI assistant
-- `GET /api/v1/chat/suggestions` - Get suggested questions
-- `POST /api/v1/chat/explain` - Get detailed explanations
-- `GET /api/v1/chat/sessions` - Manage chat sessions
-- `POST /api/v1/chat/feedback` - Provide feedback on responses
+- `POST /api/v1/chat/message`: Send message to AI assistant.
+- `POST /api/v1/chat/explain`: Get detailed explanations.
 
-### Real-time WebSocket
-- `ws://localhost:8000/api/v1/ws/alerts` - Live alert notifications
-- `ws://localhost:8000/api/v1/ws/scores` - Real-time score updates
-- `ws://localhost:8000/api/v1/ws/dashboard` - Dashboard live data
-- `ws://localhost:8000/api/v1/ws/chat` - Real-time chat interface
+### Real-time WebSockets
+- `ws://localhost:8000/api/v1/ws/alerts`: Live alert notifications.
+- `ws://localhost:8000/api/v1/ws/scores`: Real-time score updates.
 
-## Configuration
-
-### Environment Variables (`.env`)
-
-```env
+## ⚙️ Configuration
+### Environment Variables (.env)
+```bash
 # Database Configuration
 DATABASE_URL=postgresql+asyncpg://postgres:password@localhost/credit_intelligence
 
@@ -186,101 +162,31 @@ SMTP_USERNAME=your-email@gmail.com
 SMTP_PASSWORD=your-app-password
 SLACK_BOT_TOKEN=xoxb-your-slack-token
 TEAMS_WEBHOOK_URL=your-teams-webhook-url
-JIRA_API_TOKEN=your-jira-token
 
 # Security
 SECRET_KEY=your-secret-key-change-in-production
 DEBUG=false
 ```
-
 ### Pipeline Configuration (`config/config.json`)
 
-Each stage has comprehensive configuration options:
-- **Stage 1**: Data source intervals, API configurations
-- **Stage 2**: NLP models, feature engineering parameters
-- **Stage 3**: ML model settings, training parameters
-- **Stage 4**: Explainability methods, chat configurations
-- **Stage 5**: Alert thresholds, notification channels
+The `config.json` file controls the behavior of the analysis pipeline:
 
-## 🚀 Key Hackathon Features
-
-### Real-Time Event-Driven Scoring
-- **Sub-30 Second Updates**: Events detected and scored faster than traditional ratings
-- **9 Event Types**: Debt restructuring, earnings warnings, regulatory actions, etc.
-- **Impact Calibration**: Each event type has calibrated score impact (-25 to +5 points)
-- **Confidence Scoring**: Events filtered by confidence thresholds and time decay
-
-### Unstructured Data Integration
-- **NLP Event Detection**: Advanced pattern matching for credit-impacting events
-- **Multi-Source Processing**: News, social media, filings processed simultaneously
-- **Entity Recognition**: Company mentions extracted with alias matching
-- **Sentiment Integration**: Event sentiment factored into score calculations
-
-### Explainable AI
-- **Event Explanations**: Every score change includes event context and reasoning
-- **Feature Contributions**: SHAP-based explanations for model transparency
-- **Trend Analysis**: Short-term vs long-term indicators with plain-language summaries
-- **Interactive Chat**: AI assistant explains score changes and provides insights
-
-### Production-Ready Architecture
-- **Streaming Processing**: Async event queues with priority handling
-- **Fault Tolerance**: Graceful handling of data source outages
-- **WebSocket Integration**: Real-time dashboard updates
-- **Scalable Design**: Handles dozens of companies with rate limiting
+- **Stage 1**: Data source intervals and API configurations.
+- **Stage 2**: NLP models and feature engineering parameters.
+- **Stage 3**: ML model settings and training parameters.
+- **Stage 4**: Explainability methods and chat configurations.
+- **Stage 5**: Alert thresholds and notification channels.
 
 ## 📈 Monitoring & Observability
 
-- **Prometheus metrics**: Performance monitoring
-- **Health checks**: System status monitoring
-- **Logging**: Comprehensive audit trails
-- **Alert statistics**: Alert frequency and resolution tracking
+- **Prometheus metrics**: Performance monitoring exposed at `/metrics`.
+- **Health checks**: System status monitoring at `/health`.
+- **Logging**: Comprehensive structured logging for audit trails.
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch
+2. Create a feature branch (`git checkout -b feature/NewFeature`)
 3. Make your changes
 4. Add tests for new functionality
 5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## 🆘 Support
-
-For support and questions:
-- Create an issue in the repository
-- Check the documentation in `/docs`
-- Review the configuration examples
-
-## 🎯 Hackathon Deliverables
-
-### 1. **Code Repository** ✅
-- Complete implementation with atomic commits
-- Clear documentation and setup instructions
-- Modular architecture with separation of concerns
-
-### 2. **Public Demo URL** 🚧
-- FastAPI backend with interactive documentation
-- Real-time dashboard with live score updates
-- WebSocket connections for event streaming
-
-### 3. **Video Walkthrough** 📹
-- Key features demonstration (5-7 minutes)
-- End-to-end product flow
-- Technical implementation highlights
-
-### 4. **Presentation Deck** 📊
-- System architecture and design decisions
-- Model performance and explainability
-- Innovation highlights and competitive advantages
-
-## 🏅 Evaluation Alignment
-
-- **Data Engineering (20%)**: Multi-source ingestion, streaming processing, fault tolerance
-- **Model Accuracy & Explainability (30%)**: Event-driven scoring, SHAP explanations, confidence metrics
-- **Unstructured Data (12.5%)**: NLP event detection, sentiment integration, entity recognition
-- **User Experience (15%)**: Interactive dashboard, real-time updates, analyst-friendly interface
-- **Deployment (10%)**: Production-ready FastAPI, Docker containers, monitoring
-- **Innovation (12.5%)**: Real-time event processing, sub-30-second scoring, explainable updates
